@@ -5,6 +5,7 @@ import threading
 from time import perf_counter
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from .schemas import PredictionRequest, PredictionResponse
 
 log = logging.getLogger(__name__)
@@ -30,8 +31,9 @@ def create_app(finder=None):
     @app.get('/api/health')
     def health():
         engine = app.state.finder
-        return {'status': 'ready' if engine else 'unavailable', 'model': 'multilingual-e5-small ONNX int8',
-                'languages': ['en', 'hi'], 'word_senses': engine.metadata['languages'] if engine else {}}
+        return JSONResponse(status_code=200 if engine else 503, content={
+            'status': 'ready' if engine else 'unavailable', 'model': 'multilingual-e5-small ONNX int8',
+            'languages': ['en', 'hi'], 'word_senses': engine.metadata['languages'] if engine else {}})
 
     @app.get('/api/examples')
     def examples():

@@ -48,6 +48,7 @@ class APIContractTests(unittest.TestCase):
 
     def test_unavailable_service_is_not_fake_success(self):
         self.app.state.finder = None
+        self.assertEqual(self.client.get('/api/health').status_code, 503)
         self.assertEqual(self.client.get('/api/health').json()['status'], 'unavailable')
         self.assertEqual(self.client.post('/api/predict', json={'description': 'book lover'}).status_code, 503)
 
