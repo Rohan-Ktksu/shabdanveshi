@@ -6,7 +6,9 @@ A planned bilingual word finder for people who remember a meaning but cannot rec
 
 ## Current status
 
-Design stage. The approved interface is **Quiet Conversation**, with a green palette, chat-based search, a first-visit language selector, language switching, settings and an About page. The preview uses illustrative results; the search engine and deployment are not implemented yet.
+Frontend implementation stage. The approved **Quiet Conversation** interface is implemented in React and TypeScript in `frontend/`, with a green palette, chat-based search, a first-visit language selector, language switching, settings and an expanded About page. Sample conversations are explicitly illustrative. The Python search engine and deployment are not implemented yet.
+
+See [frontend setup and API contract](frontend/README.md) for instructions.
 
 ## Planned implementation
 

@@ -13,3 +13,8 @@ __pycache__/
 Thumbs.db
 backend/data/generated/
 backend/models/
+.tools/
+.pnpm-store/
+.npm-cache/
+frontend/*.tsbuildinfo
+qa/
