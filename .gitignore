@@ -18,3 +18,5 @@ backend/models/
 .npm-cache/
 frontend/*.tsbuildinfo
 qa/
+.pip-cache/
+.temp/
