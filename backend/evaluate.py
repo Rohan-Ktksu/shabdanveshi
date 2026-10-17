@@ -1,6 +1,7 @@
 """Small, transparent retrieval smoke evaluation; not a general accuracy claim."""
 import argparse
 import json
+import sys
 from pathlib import Path
 from time import perf_counter
 from .engine import Finder, normalize
@@ -33,6 +34,9 @@ CASES = [
 
 
 def main():
+    # Windows redirected consoles may default to cp1252, which cannot print Hindi.
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()

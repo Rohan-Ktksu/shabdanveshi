@@ -1,0 +1,390 @@
+{
+  "note": "Hand-authored smoke set, not a representative accuracy benchmark.",
+  "summary": {
+    "cases": 20,
+    "top1": 8,
+    "top5": 13,
+    "covered": 19
+  },
+  "corpus": {
+    "corpus_sha256": "f28e4c35a20bbdfffb944a6aee0ad01742a31c008761353669021090df89918e",
+    "model_sha256": "f80102d3f2a1229f387d3c81909990d8945513e347b0eab049f7de3c6f98c193",
+    "tokenizer_sha256": "0b44a9d7b51c3c62626640cda0e2c2f70fdacdc25bbbd68038369d14ebdf4c39",
+    "max_tokens": 128,
+    "model_revision": "761b726dd34fb83930e26aab4e9ac3899aa1fa78",
+    "entries": 150041,
+    "languages": {
+      "en": 117659,
+      "hi": 32382
+    },
+    "sources": {
+      "wordnet.zip": {
+        "url": "https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip",
+        "sha256": "cbda5ea6eef7f36a97a43d4a75f85e07fccbb4f23657d27b4ccbc93e2646ab59"
+      },
+      "hindi.jsonl": {
+        "url": "https://kaikki.org/dictionary/Hindi/kaikki.org-dictionary-Hindi.jsonl",
+        "sha256": "be3d671a9f2335b64eaf6fd938e41b9790484daf3d330d0f5c3941cfe82a79dd"
+      }
+    },
+    "created_at": "2026-10-17T18:40:54.219907+00:00"
+  },
+  "cases": [
+    {
+      "language": "en",
+      "description": "someone who loves collecting books",
+      "expected": [
+        "bibliophile",
+        "booklover",
+        "book lover"
+      ],
+      "returned": [
+        "bibliophile",
+        "rental collection",
+        "bibliopole",
+        "bibliotheca",
+        "bibliotist"
+      ],
+      "expected_in_corpus": true,
+      "rank": 1,
+      "elapsed_ms": 186.2
+    },
+    {
+      "language": "en",
+      "description": "unable to sleep at night",
+      "expected": [
+        "insomnia",
+        "sleeplessness",
+        "insomniac"
+      ],
+      "returned": [
+        "insomnia",
+        "wakefulness",
+        "narcolepsy",
+        "insomniac",
+        "unable"
+      ],
+      "expected_in_corpus": true,
+      "rank": 1,
+      "elapsed_ms": 55.0
+    },
+    {
+      "language": "en",
+      "description": "fear of being in small enclosed spaces",
+      "expected": [
+        "claustrophobia"
+      ],
+      "returned": [
+        "agoraphobia",
+        "claustrophobia",
+        "acarophobia",
+        "acrophobia",
+        "astraphobia"
+      ],
+      "expected_in_corpus": true,
+      "rank": 2,
+      "elapsed_ms": 67.3
+    },
+    {
+      "language": "en",
+      "description": "a feeling of longing for the past",
+      "expected": [
+        "nostalgia"
+      ],
+      "returned": [
+        "nostalgia",
+        "pining",
+        "olden",
+        "wistfulness",
+        "yore"
+      ],
+      "expected_in_corpus": true,
+      "rank": 1,
+      "elapsed_ms": 50.2
+    },
+    {
+      "language": "en",
+      "description": "understanding and sharing another person's feelings",
+      "expected": [
+        "empathy"
+      ],
+      "returned": [
+        "empathy",
+        "sympathy",
+        "communion",
+        "mutual understanding",
+        "sharing"
+      ],
+      "expected_in_corpus": true,
+      "rank": 1,
+      "elapsed_ms": 45.9
+    },
+    {
+      "language": "en",
+      "description": "an instrument for measuring temperature",
+      "expected": [
+        "thermometer"
+      ],
+      "returned": [
+        "thermometer",
+        "cryoscope",
+        "temperature scale",
+        "measuring instrument",
+        "calorimeter"
+      ],
+      "expected_in_corpus": true,
+      "rank": 1,
+      "elapsed_ms": 43.7
+    },
+    {
+      "language": "en",
+      "description": "a person who studies stars and planets",
+      "expected": [
+        "astronomer",
+        "uranologist",
+        "stargazer"
+      ],
+      "returned": [
+        "astrologer",
+        "astronomer",
+        "cosmologist",
+        "Galileo",
+        "astrophysicist"
+      ],
+      "expected_in_corpus": true,
+      "rank": 2,
+      "elapsed_ms": 42.3
+    },
+    {
+      "language": "en",
+      "description": "the smell of earth after rain",
+      "expected": [
+        "petrichor"
+      ],
+      "returned": [
+        "pour",
+        "rain-wash",
+        "rain",
+        "smell",
+        "rainfall"
+      ],
+      "expected_in_corpus": false,
+      "rank": null,
+      "elapsed_ms": 43.6
+    },
+    {
+      "language": "en",
+      "description": "नींद न आने की समस्या",
+      "expected": [
+        "insomnia",
+        "sleeplessness"
+      ],
+      "returned": [
+        "hypersomnia",
+        "cause to sleep",
+        "sleeping",
+        "keep up",
+        "arousal"
+      ],
+      "expected_in_corpus": true,
+      "rank": null,
+      "elapsed_ms": 43.5
+    },
+    {
+      "language": "en",
+      "description": "किताबों से प्रेम करने वाला व्यक्ति",
+      "expected": [
+        "bibliophile",
+        "booklover",
+        "book lover"
+      ],
+      "returned": [
+        "bookworm",
+        "reader",
+        "bookbinding",
+        "book agent",
+        "blue book"
+      ],
+      "expected_in_corpus": true,
+      "rank": null,
+      "elapsed_ms": 40.2
+    },
+    {
+      "language": "en",
+      "description": "समय को मापने वाला उपकरण",
+      "expected": [
+        "clock",
+        "timepiece",
+        "watch"
+      ],
+      "returned": [
+        "clock",
+        "chronograph",
+        "time unit",
+        "hour",
+        "time clock"
+      ],
+      "expected_in_corpus": true,
+      "rank": 1,
+      "elapsed_ms": 42.1
+    },
+    {
+      "language": "en",
+      "description": "दूसरों की भावनाओं को समझने की क्षमता",
+      "expected": [
+        "empathy"
+      ],
+      "returned": [
+        "empathy",
+        "compatibility",
+        "softness",
+        "moralism",
+        "superiority"
+      ],
+      "expected_in_corpus": true,
+      "rank": 1,
+      "elapsed_ms": 39.1
+    },
+    {
+      "language": "hi",
+      "description": "नींद न आने की समस्या",
+      "expected": [
+        "अनिद्रा"
+      ],
+      "returned": [
+        "सुलवाना",
+        "भटकना",
+        "कुंभकर्ण की नींद",
+        "नकटा",
+        "अपरिपक्वता"
+      ],
+      "expected_in_corpus": true,
+      "rank": null,
+      "elapsed_ms": 36.9
+    },
+    {
+      "language": "hi",
+      "description": "दूसरों की मदद करने वाला व्यक्ति",
+      "expected": [
+        "परोपकारी",
+        "मददगार"
+      ],
+      "returned": [
+        "परोपकार",
+        "यक्षी",
+        "स्वयंसेवक",
+        "लतख़ोर",
+        "हरामख़ोर"
+      ],
+      "expected_in_corpus": true,
+      "rank": null,
+      "elapsed_ms": 36.9
+    },
+    {
+      "language": "hi",
+      "description": "जिसे कभी मृत्यु न आए",
+      "expected": [
+        "अमर"
+      ],
+      "returned": [
+        "चरती",
+        "मुँहफट",
+        "नक़्क़ाल",
+        "गुमराह",
+        "नकटा"
+      ],
+      "expected_in_corpus": true,
+      "rank": null,
+      "elapsed_ms": 40.2
+    },
+    {
+      "language": "hi",
+      "description": "पानी में रहने वाली मछली",
+      "expected": [
+        "मछली",
+        "मत्स्य"
+      ],
+      "returned": [
+        "मछली",
+        "मछलीपालन",
+        "झींगा मछली",
+        "छागल",
+        "चीतल"
+      ],
+      "expected_in_corpus": true,
+      "rank": 1,
+      "elapsed_ms": 47.4
+    },
+    {
+      "language": "hi",
+      "description": "inability to fall asleep",
+      "expected": [
+        "अनिद्रा"
+      ],
+      "returned": [
+        "उन्निद्र",
+        "अनिद्र",
+        "तंद्रालस",
+        "उचावा",
+        "अकुलाना"
+      ],
+      "expected_in_corpus": true,
+      "rank": null,
+      "elapsed_ms": 48.8
+    },
+    {
+      "language": "hi",
+      "description": "a device used to tell the time",
+      "expected": [
+        "घड़ी"
+      ],
+      "returned": [
+        "तारा काल",
+        "घड़ी",
+        "समय सारणी",
+        "काल यात्री",
+        "काल यात्रा"
+      ],
+      "expected_in_corpus": true,
+      "rank": 2,
+      "elapsed_ms": 40.2
+    },
+    {
+      "language": "hi",
+      "description": "a place where books are kept for people to read",
+      "expected": [
+        "पुस्तकालय",
+        "ग्रंथालय",
+        "वाचनालय"
+      ],
+      "returned": [
+        "किताबी कीड़ा",
+        "पुस्तक कीट",
+        "पुस्तकालय",
+        "पढ़ना",
+        "ग्रंथालय"
+      ],
+      "expected_in_corpus": true,
+      "rank": 3,
+      "elapsed_ms": 46.9
+    },
+    {
+      "language": "hi",
+      "description": "a person who writes poems",
+      "expected": [
+        "कवि",
+        "शायर"
+      ],
+      "returned": [
+        "कवी",
+        "कवि",
+        "कवयित्री",
+        "शायरा",
+        "नज़्म"
+      ],
+      "expected_in_corpus": true,
+      "rank": 2,
+      "elapsed_ms": 43.9
+    }
+  ]
+}

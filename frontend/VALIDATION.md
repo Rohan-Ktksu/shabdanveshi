@@ -13,4 +13,6 @@ Checked on 17 October 2026.
 - LinkedIn and repository anchors point to the user-provided URLs.
 - At the narrow viewport checked (390 pixels requested, 375-pixel document content area), About and chat document widths equal the viewport width; no horizontal overflow.
 
-Not yet verified: live Python API responses, semantic retrieval quality, corpus coverage, hosting or production CORS. These belong to later implementation stages.
+Update, 18 October 2026: the API integration compiles, including the GitHub Pages base-path build. Live HTTP requests verify English/Hindi results, prefix filtering, source URLs and development CORS. The API now returns real dictionary results. Hindi search carries an experimental notice because its retrieval quality is uneven; see `../backend/VALIDATION.md`.
+
+Browser inspection of the updated live results was blocked by the browser access policy. The visual checks above describe the earlier frontend stage, not the new live result rendering. Hosting and production CORS remain unverified.

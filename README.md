@@ -2,24 +2,28 @@
 
 Describe the thought. Discover the word.
 
-A planned bilingual word finder for people who remember a meaning but cannot recall the word. This project extends Gorumutchu Rohan Sai's Natural Language Processing assignment on Similar Word Prediction.
+A bilingual word finder for people who remember a meaning but cannot recall the word. This project extends Gorumutchu Rohan Sai's Natural Language Processing assignment on Similar Word Prediction.
 
 ## Current status
 
-Frontend implementation stage. The approved **Quiet Conversation** interface is implemented in React and TypeScript in `frontend/`, with a green palette, chat-based search, a first-visit language selector, language switching, settings and an expanded About page. Sample conversations are explicitly illustrative. The Python search engine and deployment are not implemented yet.
+The approved **Quiet Conversation** interface is implemented in React and TypeScript in `frontend/`, with a green palette, chat-based search, a first-visit language selector, language switching, settings and an expanded About page. A Python FastAPI service retrieves English and Hindi dictionary words using multilingual E5 embeddings and a small TF-IDF contribution. Sample conversations remain explicitly illustrative. Public deployment is not completed.
 
-See [frontend setup and API contract](frontend/README.md) for instructions.
+See [frontend setup and API contract](frontend/README.md) and [Python service setup](backend/README.md). Dictionary/model preparation runs once and resumes from checkpoints if interrupted. Generated assets and dependencies stay on the project's drive and are excluded from Git.
 
-## Planned implementation
+## Implementation
 
 - React, TypeScript and Vite frontend.
 - Python and FastAPI backend.
 - English and Hindi descriptions and word suggestions, with separate interface and result-language preferences.
 - Multilingual semantic retrieval with a TF-IDF baseline and optional clues.
-- English WordNet and an appropriate licensed Hindi lexical resource. Corpus coverage and model choice require evaluation.
+- English WordNet 3.0 and Hindi Wiktionary entries extracted by Kaikki. Hindi words currently have English definitions, labeled in results. See [attribution and licenses](backend/ATTRIBUTION.md).
 - GitHub Pages frontend and a separately hosted Python API, planned for Render.
 
-Similarity scores will not be presented as probabilities. Ranking weights will be evaluated rather than assumed.
+Similarity scores are not probabilities. The current ranking is semantic cosine plus 0.05 times TF-IDF cosine, an uncalibrated starting point. `python -m backend.evaluate` runs a transparent 20-query smoke evaluation; it is not a representative accuracy benchmark.
+
+The initial evaluation found an expected answer in the top five for 13 of 20 cases. Hindi retrieval is experimental and particularly weak on some negated descriptions. See [validation results](backend/VALIDATION.md) for examples and limitations; this prototype is not yet a reliable public release.
+
+GitHub Actions checks the frontend build and Python contract/filter tests on pushes and pull requests. It does not download the full corpus or test model quality.
 
 ## Development stages
 
