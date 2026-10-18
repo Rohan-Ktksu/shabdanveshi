@@ -9,6 +9,8 @@ from .config import DATA, MODEL, MAX_TOKENS, MODEL_REVISION
 from .encoder import Encoder
 from .prepare import sha256, passage
 from .schemas import PredictionRequest
+from .bridge import GlossBridge
+from .translation import Translator
 
 
 def normalize(text):
@@ -41,13 +43,22 @@ class Finder:
         self.vectorizer = TfidfVectorizer(stop_words='english', ngram_range=(1, 2), max_features=120000, dtype=np.float32)
         self.lexical = self.vectorizer.fit_transform([passage(entry) for entry in self.entries])
         self.metadata = metadata
+        self.bridge = GlossBridge(self.entries)
+        self.translator = Translator()
+        self.last_translation = None
 
     def search(self, query: PredictionRequest):
-        vector = self.encoder.encode([query.description])[0]
+        self.last_translation = None
+        if regex.search(r'[\u0900-\u097f]', query.description) and getattr(self, 'translator', None):
+            self.last_translation = self.translator.translate(query.description)
+        search_text = self.last_translation or query.description
+        vector = self.encoder.encode([search_text])[0]
         semantic = np.asarray(self.embeddings @ vector)
-        lexical = (self.lexical @ self.vectorizer.transform([query.description]).T).toarray().ravel()
+        lexical = (self.lexical @ self.vectorizer.transform([search_text]).T).toarray().ravel()
         # Semantic-first ranking. TF-IDF is an explicitly uncalibrated tie-break aid.
         scores = semantic + 0.05 * lexical
+        if getattr(self, 'bridge', None):
+            scores = self.bridge.apply(scores)
         order = np.argsort(-scores, kind='stable')
         results, seen = [], set()
         for number in order:

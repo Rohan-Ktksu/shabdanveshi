@@ -106,6 +106,10 @@ def main():
         parser.error('threads must be between 1 and 32')
     DATA.mkdir(parents=True, exist_ok=True)
     tasks = [(url, DATA / name) for name, url in SOURCES.items()]
+    from .translation import TRANSLATION_DIR, TRANSLATION_REVISION, TRANSLATION_FILES
+    from pathlib import Path
+    for name in TRANSLATION_FILES:
+        tasks.append((f'https://huggingface.co/Xenova/opus-mt-hi-en/resolve/{TRANSLATION_REVISION}/{name}', TRANSLATION_DIR / Path(name).name))
     for name, upstream in [('tokenizer.json', 'tokenizer.json'), ('model_quantized.onnx', 'onnx/model_quantized.onnx'), ('model-card.md', 'README.md')]:
         tasks.append((f'https://huggingface.co/Xenova/multilingual-e5-small/resolve/{MODEL_REVISION}/{upstream}', MODEL / name))
     with ThreadPoolExecutor(max_workers=4) as pool:
@@ -141,6 +145,7 @@ def main():
         temp.replace(checkpoint)
         print(f'Indexed {completed:,}/{len(entries):,}', flush=True)
     metadata = {**signature, 'entries': len(entries), 'languages': {lang: sum(e['language'] == lang for e in entries) for lang in ('en', 'hi')},
+                'translation': {'revision': TRANSLATION_REVISION, 'sha256': {Path(name).name: sha256(TRANSLATION_DIR / Path(name).name) for name in TRANSLATION_FILES}},
                 'sources': {name: {'url': url, 'sha256': sha256(DATA / name)} for name, url in SOURCES.items()},
                 'created_at': datetime.now(timezone.utc).isoformat()}
     (DATA / 'metadata.json').write_text(json.dumps(metadata, indent=2), encoding='utf-8')

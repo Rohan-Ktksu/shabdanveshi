@@ -32,3 +32,17 @@ Kaikki labels its language-specific postprocessed export as deprecated. The prep
 Inference uses ONNX Runtime and the Hugging Face Tokenizers library. Inputs carry E5's `query:` / `passage:` prefixes, followed by masked mean pooling and L2 normalization. This project truncates at 128 tokens, uses quantized weights, and records both settings and asset hashes. These choices can change quality relative to the original unquantized model.
 
 Model weights, raw corpora and generated indexes are excluded from Git. Their licenses and provenance must accompany any later artifact distribution. No dictionary or model content is claimed as original project work.
+
+## Local Hindi query translation
+
+Helsinki-NLP **opus-mt-hi-en** (Apache 2.0), converted to ONNX by Xenova:
+
+- https://huggingface.co/Helsinki-NLP/opus-mt-hi-en
+- https://huggingface.co/Xenova/opus-mt-hi-en
+- Pinned conversion revision: `99853100ed9d932987a6816e8cf7b1b6742a6116`
+
+SentencePiece tokenization and a six-beam decoder translate descriptions locally. Translation can lose meaning, including negation; the interpreted text is displayed for review. Inputs beyond 128 SentencePiece tokens fall back to direct multilingual retrieval. Decoder output is bounded to 64 steps.
+
+An exact-gloss bridge connects Hindi translations with English WordNet senses of the same part of speech. It adds retrieval context but does not replace the displayed Wiktionary definition. The compact export quantizes dictionary vectors to int8 and exports TF-IDF postings into disk-backed files. These derived Hindi resources retain CC BY-SA 4.0 attribution.
+
+Runtime archives include attribution and the license notices in `licenses/`. The experimental full-precision model is not included in the runtime archive.

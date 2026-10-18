@@ -38,6 +38,7 @@ class Suggestion(BaseModel):
 
 
 class PredictionResponse(BaseModel):
+    translated_query: str | None = None
     suggestions: list[Suggestion]
     method: str
     elapsed_ms: float

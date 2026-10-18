@@ -9,6 +9,9 @@ from .config import MODEL, MAX_TOKENS
 class Encoder:
     def __init__(self, threads=4):
         options = ort.SessionOptions()
+        options.enable_cpu_mem_arena = False
+        options.enable_mem_pattern = False
+        options.add_session_config_entry('session.disable_prepacking', '1')
         options.intra_op_num_threads = threads
         self.session = ort.InferenceSession(str(MODEL / 'model_quantized.onnx'), options,
                                            providers=['CPUExecutionProvider'])
