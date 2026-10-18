@@ -98,7 +98,7 @@ export default function App() {
     if (!api) { setError('notConnected'); return; }
     setBusy(true); setError(null);
     const controller = new AbortController(); request.current = controller;
-    const timer = setTimeout(() => controller.abort(), 60000);
+    const timer = setTimeout(() => controller.abort(), 180000);
     try {
       const response = await fetch(`${api}/api/predict`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal, body: JSON.stringify({ description: query, language: preferences.results, starting_letter: letter.trim() || null, approximate_length: length ? Number(length) : null, part_of_speech: pos || null, limit: 5 }) });
       if (request.current !== controller) return;

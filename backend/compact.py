@@ -36,7 +36,7 @@ class CompactFinder:
     def infer(self, mode, text):
         result = subprocess.run([sys.executable, '-m', 'backend.inference_worker'],
             input=json.dumps({'mode':mode,'text':text}), text=True, encoding='utf-8',
-            capture_output=True, timeout=20, check=True, cwd=ROOT.parent,
+            capture_output=True, timeout=90, check=True, cwd=ROOT.parent,
             creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
         return json.loads(result.stdout)
 
