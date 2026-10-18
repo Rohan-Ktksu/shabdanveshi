@@ -1,55 +1,217 @@
-# ShabdAnveshi
+# ShabdAnveshi · शब्दान्वेषी
 
-Describe the thought. Discover the word.
+**Describe the thought. Discover the word.**
 
-A bilingual word finder for people who remember a meaning but cannot recall the word. This project extends Gorumutchu Rohan Sai's Natural Language Processing assignment on Similar Word Prediction.
+A bilingual reverse dictionary for moments when you remember a meaning but cannot recall the word. Describe a person, feeling, object or idea in English or Hindi, and search real dictionary entries for possible matches.
 
-## Current status
+**[Open ShabdAnveshi](https://rohan-ktksu.github.io/shabdanveshi/)** · [API documentation](https://shabdanveshi-api.onrender.com/docs) · [LinkedIn](https://www.linkedin.com/in/rohansai0907)
 
-The approved **Quiet Conversation** interface is implemented in React and TypeScript in `frontend/`, with a green palette, chat-based search, a first-visit language selector, language switching, settings and an expanded About page. A Python FastAPI service retrieves English and Hindi dictionary words using multilingual E5 embeddings and a small TF-IDF contribution. Sample conversations remain explicitly illustrative. Public deployment is not completed.
+The React frontend runs on GitHub Pages and the Python API on Render Free. Both deployments were verified on **18 October 2026**. This is an academic prototype: ambiguous descriptions, missing vocabulary and translation errors can affect results. Free hosting can make searches slow, especially after inactivity.
 
-See [frontend setup and API contract](frontend/README.md) and [Python service setup](backend/README.md). Dictionary/model preparation runs once and resumes from checkpoints if interrupted. Generated assets and dependencies stay on the project's drive and are excluded from Git.
+## Our journey
 
-## Implementation
+### 1. An assignment became a practical idea
 
-- React, TypeScript and Vite frontend.
-- Python and FastAPI backend.
-- English and Hindi descriptions and word suggestions, with separate interface and result-language preferences.
-- Multilingual semantic retrieval with a TF-IDF baseline and optional clues.
-- English WordNet 3.0 and Hindi Wiktionary entries extracted by Kaikki. Hindi words currently have English definitions, labeled in results. See [attribution and licenses](backend/ATTRIBUTION.md).
-- GitHub Pages frontend and a separately hosted Python API, planned for Render.
+The project began as a Natural Language Processing assignment on **Similar Word Prediction**. We chose a **Tip of the Tongue Finder**: reverse the usual dictionary question, describing a meaning to recover a word. The initial work centred on a Python implementation, an assignment report, a pipeline diagram, and notebook-style code and results.
 
-Similarity scores are not probabilities. The current ranking is semantic cosine plus 0.05 times TF-IDF cosine, an uncalibrated starting point. `python -m backend.evaluate` runs a transparent 20-query smoke evaluation; it is not a representative accuracy benchmark.
+The next question was whether it could handle more than a short list of examples. That led to dictionary corpora and semantic retrieval. A larger corpus expands the search space, but does not guarantee an answer for every possible context.
 
-The initial evaluation found an expected answer in the top five for 13 of 20 cases. Hindi retrieval is experimental and particularly weak on some negated descriptions. See [validation results](backend/VALIDATION.md) for examples and limitations; this prototype is not yet a reliable public release.
+### 2. Naming and designing the website
 
-The updated compact pipeline reaches 16/20 top-five and 11/20 first-place matches on the same diagnostic set. It adds local Hindi query translation and an exact-gloss WordNet bridge. These are development-set results, not independent accuracy estimates; negation remains a limitation. [Free-tier deployment instructions](DEPLOYMENT.md) describe the GitHub Pages/Render setup and the mandatory 512 MB container check.
+After exploring English and Indian-language names, the project became **ShabdAnveshi**, reflecting the search for words. Several interface concepts were considered; the green **Quiet Conversation** design was selected.
 
-GitHub Actions checks the frontend build and Python contract/filter tests on pushes and pull requests. It does not download the full corpus or test model quality.
+The interface puts the description box at the centre, the logo on the left, and language/settings controls on the right. First-time visitors choose English or Hindi. The About page explains the motivation, journey, libraries, search logic and creator details, with LinkedIn and repository links. [The original design reference](designs/concepts.html) is a preview artifact, not the deployed application.
 
-## Development stages
+### 3. Building the interface and API
 
-1. Record approved design and project requirements.
-2. Build the responsive chat and About pages.
-3. Add the Python API and lexical data preparation.
-4. Implement and evaluate bilingual word retrieval.
-5. Connect frontend and backend and test the complete workflow.
-6. Configure deployment and publish verified URLs.
+We used **React, TypeScript and Vite** for the frontend and **Python with FastAPI** for the backend. GitHub Pages serves the static frontend; Render provides the running Python process.
 
-Each meaningful stage will be committed separately. The project is maintained at `D:\sem 5\ShabdAnveshi`.
+Interface language and result language are independent: a user can keep the interface in English, type Hindi, and request English, Hindi or both kinds of words. Starting letters, approximate length and part of speech provide optional clues. Sample conversations are explicitly illustrative; real searches call the API.
 
-## Design reference
+Meaningful implementation stages were committed separately. The local project and its development resources are maintained at **D:\sem 5\ShabdAnveshi**. Large generated data, model weights and dependencies are excluded from Git.
 
-`designs/concepts.html` contains the interactive design reference for the chat preview renderer. It relies on that renderer for carousel and icon support; it is not the deployable application.
+### 4. Preparing the dictionary corpus
 
-## Author and academic details
+The prepared index contains **150,041 word senses**, not 150,041 unique words:
 
-- **Name:** Gorumutchu Rohan Sai
-- **SRN:** R24EJ042
-- **Class:** CSIT A, 5th Semester
-- **Subject:** Natural Language Processing
-- **Course code:** B25EJS503
-- **Professor:** Arati C
-- **Topic:** Similar Word Prediction
+| Source | Language | Senses |
+| --- | --- | ---: |
+| WordNet 3.0 | English | 117,659 |
+| Hindi Wiktionary extracted through Kaikki | Hindi | 32,382 |
 
-[LinkedIn](https://www.linkedin.com/in/rohansai0907) · [GitHub repository](https://github.com/Rohan-Ktksu/shabdanveshi)
+Hindi headwords in this dataset have **English glosses**, labelled in the interface. Results retain their definitions and source attribution.
+
+Preparation downloads source data and pinned model resources, constructs dictionary records, and encodes descriptions into 384-dimensional multilingual E5 vectors. It uses query/passage prefixes, masked mean pooling and normalization. Checkpoints allow interrupted preparation to resume when resource hashes match.
+
+### 5. Testing the first retrieval pipeline
+
+The first system combined semantic similarity with a small TF-IDF contribution. English examples often worked, but Hindi descriptions exposed weaknesses, especially around negation.
+
+We evaluated 20 diagnostic descriptions with fixed expected answers. The baseline placed an expected answer first in **8/20** cases and within the first five in **13/20**. This separated retrieval quality from whether an API request merely succeeded.
+
+### 6. Improving Hindi search
+
+Two changes improved retrieval:
+
+- **Local OPUS-MT translation:** Hindi-script descriptions are translated into English before search. The interface shows the interpreted text so translation mistakes can be noticed. Searches do not call an external translation API.
+- **Exact-gloss WordNet bridge:** Hindi entries whose English gloss segments match a WordNet lemma or alias of the same part of speech can inherit that sense's retrieval score. Displayed definitions and attribution remain attached to the original entry.
+
+| Pipeline | Expected answer first | In first five |
+| --- | ---: | ---: |
+| Original baseline | 8/20 | 13/20 |
+| Improved full runtime | 10/20 | 16/20 |
+| Final compact runtime | 11/20 | 16/20 |
+
+The corpus contained an expected answer for **19/20** cases; *petrichor* was absent. The expected-answer lists remained unchanged. Because these cases guided improvements, these numbers are **development diagnostics, not held-out accuracy estimates**. Negation remains difficult, and translation can lose meaning.
+
+See [validation notes](backend/VALIDATION.md), [baseline results](backend/evaluation.json) and [compact results](backend/evaluation-compact.json).
+
+### 7. Fitting the system into free hosting
+
+The improved in-process backend measured roughly **1.15 GB of memory on Windows**. Keeping hosting free required a different runtime layout:
+
+- SQLite stores dictionary records and term metadata.
+- Dictionary vectors are exported as int8 with normalization data.
+- TF-IDF postings are precomputed; arrays are memory-mapped from disk.
+- Translation and embedding run in separate short-lived Python processes, releasing each model before the next stage.
+- Vector scoring happens in chunks, and mapped arrays close after each search.
+
+This trades speed for lower resident memory. Full resources remain useful for preparation and comparison; production uses the compact export.
+
+A GitHub Actions workflow prepares the assets and tests the API in a Docker container capped at **512 MB, with no extra swap**. It publishes an archive and SHA-256 checksum only after repeated search checks succeed. [The runtime-1 release](https://github.com/Rohan-Ktksu/shabdanveshi/releases/tag/runtime-1) passed that check. This verifies the tested workload, not unlimited traffic capacity.
+
+### 8. Deployment and the production timeout fix
+
+We created a **Render Blueprint** from the repository, explicitly using its **Free** plan. Startup downloads the versioned archive and verifies its checksum before extraction. The frontend receives the API address through the public GitHub Actions variable `VITE_API_URL` and builds with the `/shabdanveshi/` base path. CORS allows the GitHub Pages origin.
+
+Real production testing found a problem that local testing missed: Hindi translation on the free CPU exceeded the original **20-second worker timeout**. We raised the worker limit to **90 seconds** and the frontend request limit to **180 seconds**, committed the fix, and deployed both services again.
+
+The live description **“किताबों से प्रेम करने वाला व्यक्ति”** was then interpreted as **“A Lover of Books”** and returned **bibliophile** first. That request took about **39 seconds**. An English book-lover query also returned bibliophile first. These are observed examples, not guarantees for every description.
+
+## How a search works
+
+```mermaid
+flowchart TD
+    A[Description and optional clues] --> B{Hindi script?}
+    B -->|Yes| C[Local OPUS-MT translation]
+    B -->|No| D[Query text]
+    C --> D
+    D --> E[Multilingual E5 embedding]
+    D --> F[TF-IDF query terms]
+    E --> G[Compare dictionary vectors]
+    F --> H[Read precomputed postings]
+    G --> I[Combine scores]
+    H --> I
+    I --> J[Exact-gloss WordNet bridge]
+    J --> K[Filter clues and deduplicate]
+    K --> L[Words, definitions and source links]
+```
+
+Before bridge propagation, ranking uses:
+
+```text
+ranking score = semantic cosine similarity + 0.05 × TF-IDF cosine similarity
+```
+
+**Semantic similarity** compares meaning through embeddings. **TF-IDF** adds evidence from shared words and phrases. The weight is an initial choice, not a calibrated probability. The API's `score` and `semantic_score` fields report semantic similarity; they need not decrease strictly in final rank order after lexical scoring and bridge propagation.
+
+Language and part-of-speech filters are exact. Prefixes use Unicode normalization and case folding. Approximate length allows ±1 letter-containing grapheme cluster, avoiding counting Hindi combining marks as separate visible letters. Duplicate word/language pairs are removed.
+
+## Technology
+
+| Technology | Responsibility |
+| --- | --- |
+| React + TypeScript | Chat, results, language preferences, About and settings |
+| Vite + Lucide React | Production builds and interface icons |
+| Python + FastAPI + Uvicorn | Request validation and HTTP API |
+| multilingual-e5-small + ONNX Runtime + Tokenizers | Quantized multilingual semantic inference |
+| OPUS-MT Hindi–English + SentencePiece | Local translation and tokenization |
+| scikit-learn | TF-IDF preparation and full reference runtime |
+| NumPy + SQLite | Compact vectors, postings, ranking and dictionary lookup |
+| regex | Unicode-aware clue handling |
+| Docker + GitHub Actions | Runtime packaging, checks, asset builds and deployment |
+| GitHub Pages + Render Free | Static frontend and Python backend hosting |
+
+## Run locally
+
+Use **Python 3.12** and **Node.js 22.12+**. The commands below assume the existing D-drive checkout. Corpus/model preparation downloads substantial resources and can take time.
+
+```powershell
+cd "D:\sem 5\ShabdAnveshi"
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r backend\requirements.txt --cache-dir .pip-cache
+.\.venv\Scripts\python.exe -m backend.prepare
+.\.venv\Scripts\python.exe -m backend.build_compact
+$env:SHABD_ENGINE = "compact"
+.\.venv\Scripts\python.exe -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+```
+
+In a second terminal:
+
+```powershell
+cd "D:\sem 5\ShabdAnveshi\frontend"
+npm ci
+npm run dev
+```
+
+Before starting Vite, create `frontend/.env.local` with `VITE_API_URL=http://127.0.0.1:8000`. Restart Vite after changing it. `VITE_` values are public configuration, never secrets. For a new all-D-drive setup, direct package caches and temporary downloads to D: as well.
+
+More details: [frontend guide](frontend/README.md), [backend guide](backend/README.md), [deployment guide](DEPLOYMENT.md).
+
+## Checks and workflows
+
+| Verification | What it establishes |
+| --- | --- |
+| 11 Python unit tests | API contracts, filters and exact-gloss bridge behaviour |
+| TypeScript + Vite build | Frontend type correctness and production bundling |
+| Fixed 20-case evaluation | Diagnostic retrieval quality and coverage |
+| 512 MB Docker smoke test | Tested requests complete within the container limit |
+| Live API and browser checks | Public delivery, CORS, onboarding and real search behaviour |
+
+Run unit tests with `python -m unittest backend.test_api backend.test_retrieval backend.test_bridge -v`. With resources prepared, run `python -m backend.evaluate --compact` for retrieval evaluation. Run `npm run build` from `frontend/` to build the interface.
+
+- **Project checks** runs on pushes and pull requests, building the frontend and running unit tests without downloading the full corpus.
+- **Build and verify free-tier runtime** manually prepares, tests and publishes model/index assets.
+- **Deploy frontend to GitHub Pages** manually checks API readiness, builds and publishes the frontend.
+- **Render auto-deploy** deploys backend changes from `main`. Resource changes require a newly verified archive and updated asset URL/checksum settings.
+
+## Limitations and lessons
+
+- Dictionary coverage bounds the answers. The system cannot reliably recover every word from every context.
+- Hindi retrieval remains experimental; negation, ambiguity and translation errors can produce weak suggestions.
+- Hindi entries currently have English definitions. Full Hindi definitions are not implemented.
+- Similarity scores are not confidence percentages.
+- Free hosting brings cold starts and slow inference. A longer timeout allows more time; it does not make the model faster.
+- One inference request is admitted at a time. Busy requests receive HTTP 429; unavailable resources or inference failures return errors rather than fabricated answers.
+- Successful builds and health checks do not establish search quality. The production Hindi test exposed the timeout issue.
+- Future work could include broader held-out evaluation, better negation handling, richer Hindi lexical data and latency improvements measured within the memory budget.
+
+## Repository map
+
+```text
+frontend/               React interface and setup guide
+backend/                API, preparation, retrieval, tests and evaluation
+backend/licenses/       Third-party resource licenses
+.github/workflows/      Checks, asset build and Pages deployment
+designs/                Original interface concepts
+Dockerfile              Production Python container
+render.yaml             Free Render service configuration
+DEPLOYMENT.md           Deployment procedure
+```
+
+## Creator and academic context
+
+| Detail | Value |
+| --- | --- |
+| Name | Gorumutchu Rohan Sai |
+| SRN | R24EJ042 |
+| Class and section | CSIT A |
+| Semester | 5th Semester |
+| Subject | Natural Language Processing |
+| Course code | B25EJS503 |
+| Professor | Arati C |
+| Assignment topic | Similar Word Prediction |
+
+[GitHub repository](https://github.com/Rohan-Ktksu/shabdanveshi) · [LinkedIn](https://www.linkedin.com/in/rohansai0907)
+
+Dictionary data and pretrained models have their own licenses. Read [resource attribution](backend/ATTRIBUTION.md) and [included licenses](backend/licenses) before redistributing assets. ShabdAnveshi uses existing pretrained models; it does not claim to have trained E5 or OPUS-MT from scratch.

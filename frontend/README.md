@@ -55,7 +55,7 @@ Expected response shape (illustrative):
 }
 ```
 
-An optional numeric `score` is a similarity measure, not a confidence probability. Real results also include `source`, `source_url` and `definition_language`. Source links are restricted to HTTPS; Hindi entries with English definitions are explicitly labeled. Invalid responses and network failures leave the typed description available for retry. Requests time out after 60 seconds. Busy (429), unavailable (503) and invalid clue (422) responses have separate messages.
+An optional numeric `score` is a similarity measure, not a confidence probability. Real results also include `source`, `source_url` and `definition_language`. Source links are restricted to HTTPS; Hindi entries with English definitions are explicitly labeled. Invalid responses and network failures leave the typed description available for retry. Requests time out after 180 seconds to accommodate slower free-tier inference. Busy (429), unavailable (503) and invalid clue (422) responses have separate messages.
 
 ## Production build
 
@@ -71,3 +71,4 @@ npm run build -- --base=/shabdanveshi/
 ```
 
 Hash routes (`#about`, `#settings`) avoid server-side routing requirements. Deployment configuration is a later stage. Google Fonts are optional external style resources; system fonts provide fallbacks.
+
