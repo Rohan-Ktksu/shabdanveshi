@@ -23,6 +23,8 @@ Similarity scores are not probabilities. The current ranking is semantic cosine 
 
 The initial evaluation found an expected answer in the top five for 13 of 20 cases. Hindi retrieval is experimental and particularly weak on some negated descriptions. See [validation results](backend/VALIDATION.md) for examples and limitations; this prototype is not yet a reliable public release.
 
+The updated compact pipeline reaches 16/20 top-five and 11/20 first-place matches on the same diagnostic set. It adds local Hindi query translation and an exact-gloss WordNet bridge. These are development-set results, not independent accuracy estimates; negation remains a limitation. [Free-tier deployment instructions](DEPLOYMENT.md) describe the GitHub Pages/Render setup and the mandatory 512 MB container check.
+
 GitHub Actions checks the frontend build and Python contract/filter tests on pushes and pull requests. It does not download the full corpus or test model quality.
 
 ## Development stages

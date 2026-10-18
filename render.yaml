@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: shabdanveshi-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: SHABD_ENGINE
+        value: compact
+      - key: CORS_ORIGINS
+        value: https://rohan-ktksu.github.io
+      - key: ASSETS_URL
+        sync: false
+      - key: ASSETS_SHA256
+        sync: false

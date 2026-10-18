@@ -1,0 +1,40 @@
+name: Build and verify free-tier runtime
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - run: pip install -r backend/requirements.txt
+      - run: python -m unittest backend.test_api backend.test_retrieval backend.test_bridge -v
+      - run: python -m backend.prepare --threads 2
+      - run: python -m backend.build_compact
+      - name: Build runtime container
+        run: docker build -t shabd-runtime .
+      - name: Run with a hard 512 MB memory limit
+        run: |
+          docker run -d --name shabd-memory --memory=512m --memory-swap=512m --cpus=1 \
+            -p 127.0.0.1:8000:8000 \
+            -v "$PWD/backend/models:/app/backend/models:ro" \
+            -v "$PWD/backend/data/generated/compact:/app/backend/data/generated/compact:ro" \
+            shabd-runtime python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
+          python -m backend.deployment_smoke
+          docker exec shabd-memory cat /sys/fs/cgroup/memory.peak
+      - name: Container logs
+        if: always()
+        run: docker logs shabd-memory || true
+      - run: python -m backend.package_assets
+      - name: Publish verified assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: runtime-${{ github.run_number }}
+        run: gh release create "$RELEASE_TAG" runtime-assets.tar.gz runtime-assets.tar.gz.sha256 --target "$GITHUB_SHA" --title "$RELEASE_TAG" --notes "Compact runtime assets. API smoke tests passed in a container limited to 512 MB. Source and model attribution included. This is not a production availability guarantee."

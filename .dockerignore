@@ -1,0 +1,7 @@
+*
+!backend/
+!backend/**
+backend/models/
+backend/data/
+backend/__pycache__/
+backend/evaluation*.json
