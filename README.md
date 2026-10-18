@@ -1,10 +1,12 @@
 # ShabdAnveshi · शब्दान्वेषी
 
-**Describe the thought. Discover the word.**
+**[🌐 Visit the live website](https://rohan-ktksu.github.io/shabdanveshi/)**
+
+*Describe the thought. Discover the word.*
 
 A bilingual reverse dictionary for moments when you remember a meaning but cannot recall the word. Describe a person, feeling, object or idea in English or Hindi, and search real dictionary entries for possible matches.
 
-**[Open ShabdAnveshi](https://rohan-ktksu.github.io/shabdanveshi/)** · [API documentation](https://shabdanveshi-api.onrender.com/docs) · [LinkedIn](https://www.linkedin.com/in/rohansai0907)
+[API documentation](https://shabdanveshi-api.onrender.com/docs) · [LinkedIn](https://www.linkedin.com/in/rohansai0907)
 
 The React frontend runs on GitHub Pages and the Python API on Render Free. Both deployments were verified on **18 October 2026**. This is an academic prototype: ambiguous descriptions, missing vocabulary and translation errors can affect results. Free hosting can make searches slow, especially after inactivity.
 
