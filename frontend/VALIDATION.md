@@ -16,3 +16,5 @@ Checked on 17 October 2026.
 Update, 18 October 2026: the API integration compiles, including the GitHub Pages base-path build. Live HTTP requests verify English/Hindi results, prefix filtering, source URLs and development CORS. The API now returns real dictionary results. Hindi search carries an experimental notice because its retrieval quality is uneven; see `../backend/VALIDATION.md`.
 
 Browser inspection of the updated live results was blocked by the browser access policy. The visual checks above describe the earlier frontend stage, not the new live result rendering. Hosting and production CORS remain unverified.
+
+The translation update adds the backend's interpreted query text to results and explains OPUS-MT in About. TypeScript and the production build pass; browser visual verification of these additions remains unavailable.
