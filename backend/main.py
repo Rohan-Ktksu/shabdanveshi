@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 import logging
 import os
 import threading
+import subprocess
 from time import perf_counter
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,7 +17,10 @@ def create_app(finder=None):
     async def lifespan(app):
         if app.state.finder is None:
             try:
-                from .engine import Finder
+                if os.environ.get('SHABD_ENGINE') == 'compact':
+                    from .compact import CompactFinder as Finder
+                else:
+                    from .engine import Finder
                 app.state.finder = Finder()
             except (OSError, ValueError, KeyError) as exc:
                 log.error('Search resources are unavailable: %s', exc)
@@ -50,10 +54,15 @@ def create_app(finder=None):
         start = perf_counter()
         try:
             suggestions = engine.search(query)
+            translated_query = getattr(engine, 'last_translation', None)
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+            log.error('Inference worker failed: %s', type(exc).__name__)
+            raise HTTPException(503, 'Search resources are temporarily unavailable. Please retry.') from exc
         finally:
             app.state.busy.release()
         warnings = ['Hindi words currently have English dictionary definitions.'] if any(s['language'] == 'hi' for s in suggestions) else []
-        return {'suggestions': suggestions, 'method': 'multilingual-e5-small + 0.05 TF-IDF (uncalibrated baseline)',
+        return {'suggestions': suggestions, 'translated_query': translated_query,
+                'method': 'local OPUS-MT + multilingual E5 + TF-IDF + exact-gloss WordNet bridge',
                 'elapsed_ms': round((perf_counter() - start) * 1000, 1), 'warnings': warnings}
 
     return app

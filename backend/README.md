@@ -38,3 +38,9 @@ Use one Uvicorn worker initially: multiple workers duplicate model/dictionary me
 ```
 
 Contract tests use an explicit test fixture; they validate request/response handling, not model quality. Real retrieval evaluation is separate. See `ATTRIBUTION.md` before redistributing data.
+
+## Improved Hindi retrieval and compact runtime
+
+Hindi-script descriptions are translated locally with OPUS-MT before retrieval. The API returns `translated_query`; the frontend displays it because translation can lose meaning. Hindi glosses matching an English WordNet lemma of the same part of speech can inherit that sense's retrieval score. Displayed definitions remain unchanged and attributed. Scores are still not calibrated probabilities.
+
+Prepare the compact export with `python -m backend.build_compact`, then set `SHABD_ENGINE=compact` before starting Uvicorn. Compact mode uses SQLite, int8 vectors, precomputed TF-IDF postings and isolated inference processes. `python -m backend.evaluate --compact --output backend/evaluation-compact.json` evaluates it. It trades latency for lower memory; it does not prove compliance with a hosting memory limit. See `../DEPLOYMENT.md` for the required container gate and free-only configuration.

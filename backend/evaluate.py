@@ -2,6 +2,7 @@
 import argparse
 import json
 import sys
+import gzip
 from pathlib import Path
 from time import perf_counter
 from .engine import Finder, normalize
@@ -39,9 +40,18 @@ def main():
         sys.stdout.reconfigure(encoding='utf-8')
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--compact', action='store_true')
     args = parser.parse_args()
-    engine = Finder()
-    vocabulary = {(e['language'], normalize(word)) for e in engine.entries for word in [e['word'], *e['aliases']]}
+    if args.compact:
+        from .compact import CompactFinder
+        from .config import DATA
+        engine = CompactFinder()
+        with gzip.open(DATA / 'entries.json.gz', 'rt', encoding='utf-8') as stream:
+            entries = json.load(stream)
+    else:
+        engine = Finder()
+        entries = engine.entries
+    vocabulary = {(e['language'], normalize(word)) for e in entries for word in [e['word'], *e['aliases']]}
     rows = []
     for language, description, expected in CASES:
         start = perf_counter()
@@ -50,6 +60,7 @@ def main():
         acceptable = {normalize(w) for w in expected}
         rank = next((i + 1 for i, word in enumerate(words) if normalize(word) in acceptable), None)
         row = dict(language=language, description=description, expected=expected, returned=words,
+                   translated_query=engine.last_translation,
                    expected_in_corpus=any((language, w) in vocabulary for w in acceptable),
                    rank=rank, elapsed_ms=round((perf_counter() - start) * 1000, 1))
         rows.append(row)
