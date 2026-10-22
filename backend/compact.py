@@ -11,6 +11,7 @@ from .config import DATA
 from .cache import ExpiringCache
 from .inference import InferenceWorker
 from .memory import release_unused_memory
+from .query_tokenizer import ensure_prepared
 
 
 def normalize(text):
@@ -36,6 +37,8 @@ class CompactFinder:
         self.inference_cache = ExpiringCache(64)
         self.score_cache = ExpiringCache(4)  # About 7 MiB for the current corpus.
         self.result_cache = ExpiringCache(64)
+        release_unused_memory()
+        ensure_prepared()
         release_unused_memory()
 
     def close(self):

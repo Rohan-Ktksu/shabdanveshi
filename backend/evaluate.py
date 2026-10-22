@@ -69,7 +69,11 @@ def main():
                    top5=sum(r['rank'] is not None for r in rows),
                    covered=sum(r['expected_in_corpus'] for r in rows))
     report = dict(note='Hand-authored smoke set, not a representative accuracy benchmark.',
-                  summary=summary, corpus=engine.metadata, cases=rows)
+                  summary=summary, corpus=engine.metadata,
+                  runtime={'engine': 'compact' if args.compact else 'full',
+                           'query_graph_optimization': 'default',
+                           'query_tokenizer': 'derived-sentencepiece' if args.compact else 'huggingface-tokenizers',
+                           'encoder_threads': 1 if args.compact else 4}, cases=rows)
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')

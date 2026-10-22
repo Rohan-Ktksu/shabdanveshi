@@ -18,6 +18,7 @@ jobs:
       - run: python -m unittest backend.test_api backend.test_retrieval backend.test_bridge backend.test_performance -v
       - run: python -m backend.prepare --threads 2
       - run: python -m backend.build_compact
+      - run: python -m backend.query_tokenizer
       - name: Build runtime container
         run: docker build -t shabd-runtime .
       - name: Run with a hard 512 MB memory limit

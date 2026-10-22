@@ -63,6 +63,17 @@ jobs:
           python -m backend.deployment_smoke
           docker exec shabd-memory cat /sys/fs/cgroup/memory.peak
           docker exec shabd-memory sh -c '! grep -Eq "^oom_kill [1-9]" /sys/fs/cgroup/memory.events'
+      - name: Compare compact tokenization with the original tokenizer
+        run: |
+          mkdir -p .temp/tokenizer
+          for file in tokenizer.json query-tokenizer.model query-tokenizer.json; do
+            docker cp "shabd-memory:/app/backend/models/multilingual-e5-small/$file" .temp/tokenizer/
+          done
+          # This independent equivalence test loads BOTH tokenizers. It is
+          # separate from the API workload already tested with a 512 MB limit.
+          docker run --rm --memory=1g --memory-swap=1g \
+            -v "$PWD/.temp/tokenizer:/app/backend/models/multilingual-e5-small:ro" \
+            shabd-runtime python -m backend.validate_tokenizer
       - name: Container logs
         if: always()
         run: |

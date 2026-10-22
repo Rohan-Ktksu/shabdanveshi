@@ -15,12 +15,10 @@ class Encoder:
         options.add_session_config_entry('session.disable_prepacking', '1')
         options.intra_op_num_threads = threads
         if compact:
-            # Keep the compact query worker's quantized graph as exported.
-            # Whole-graph optimization can expand its peak working memory.
-            options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_DISABLE_ALL
-        # Tokenizer JSON parsing temporarily uses much more memory than the
-        # retained vocabulary. Finish it before loading the ONNX session.
-        self.tokenizer = self.make_tokenizer() if compact else None
+            from .query_tokenizer import QueryTokenizer
+            self.tokenizer = QueryTokenizer()
+        else:
+            self.tokenizer = None
         if compact:
             release_unused_memory()
         self.session = ort.InferenceSession(str(MODEL / 'model_quantized.onnx'), options,
