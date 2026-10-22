@@ -18,3 +18,5 @@ Update, 18 October 2026: the API integration compiles, including the GitHub Page
 Browser inspection of the updated live results was blocked by the browser access policy. The visual checks above describe the earlier frontend stage, not the new live result rendering. Hosting and production CORS remain unverified.
 
 The translation update adds the backend's interpreted query text to results and explains OPUS-MT in About. TypeScript and the production build pass; browser visual verification of these additions remains unavailable.
+
+Update, 22 October 2026: the page-load health request compiles in the TypeScript/Vite GitHub Pages build. It runs once per mount, is aborted on unmount or after 90 seconds, and adds no visual changes. Public hosting was verified after the earlier notes above on 18 October; this latest frontend build has not yet been published. Backend cache/worker changes pass the real local HTTP smoke checks; the new 512 MB check still needs to run in GitHub Actions.

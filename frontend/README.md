@@ -57,6 +57,8 @@ Expected response shape (illustrative):
 
 An optional numeric `score` is a similarity measure, not a confidence probability. Real results also include `source`, `source_url` and `definition_language`. Source links are restricted to HTTPS; Hindi entries with English definitions are explicitly labeled. Invalid responses and network failures leave the typed description available for retry. Requests time out after 180 seconds to accommodate slower free-tier inference. Busy (429), unavailable (503) and invalid clue (422) responses have separate messages.
 
+When `VITE_API_URL` is configured, opening the app sends one health request (90-second limit) so a sleeping free backend can start while the visitor chooses a language or types. This is not recurring keep-alive traffic; searches retain their own error handling and timeout. Cold starts can still delay a result.
+
 ## Production build
 
 ```powershell

@@ -75,6 +75,17 @@ export default function App() {
   useEffect(() => { const changed = () => setPage(route()); window.addEventListener('hashchange', changed); return () => window.removeEventListener('hashchange', changed); }, []);
   useEffect(() => { document.documentElement.lang = preferences.language; if (!firstVisit) try { localStorage.setItem(key, JSON.stringify(preferences)); } catch { /* Preferences still work for this visit. */ } }, [preferences, firstVisit]);
   useEffect(() => () => request.current?.abort(), []);
+  useEffect(() => {
+    // Wake the free backend while the visitor chooses a language or types.
+    const api = import.meta.env.VITE_API_URL?.trim().replace(/\/$/, '');
+    if (!api) return;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 90000);
+    void fetch(`${api}/api/health`, { signal: controller.signal })
+      .catch(() => { /* Search already handles unavailable services. */ })
+      .finally(() => clearTimeout(timer));
+    return () => { clearTimeout(timer); controller.abort(); };
+  }, []);
 
   function selectLanguage(language: Language) {
     setPreferences(current => ({ ...current, language, ...(firstVisit ? { results: language } : {}) }));
