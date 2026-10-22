@@ -24,7 +24,11 @@ def create_app(finder=None):
                 app.state.finder = Finder()
             except (OSError, ValueError, KeyError) as exc:
                 log.error('Search resources are unavailable: %s', exc)
-        yield
+        try:
+            yield
+        finally:
+            if app.state.finder is not None and hasattr(app.state.finder, 'close'):
+                app.state.finder.close()
 
     app = FastAPI(title='ShabdAnveshi API', version='0.2.0', lifespan=lifespan)
     app.state.finder = finder

@@ -1,0 +1,47 @@
+{
+  "note": "Sequential local Windows measurements with OPENBLAS_NUM_THREADS=1 and OMP_NUM_THREADS=1. Not HTTP timings, not production latency. Hindi result quality remains experimental.",
+  "cases": [
+    {
+      "case": "First English search",
+      "elapsed_ms": 1911.509,
+      "top_word": "bibliophile",
+      "encoder_retained": true
+    },
+    {
+      "case": "Different English search, warm encoder",
+      "elapsed_ms": 244.314,
+      "top_word": "nostalgia",
+      "encoder_retained": true
+    },
+    {
+      "case": "Repeated English search",
+      "elapsed_ms": 0.056,
+      "top_word": "bibliophile",
+      "encoder_retained": true
+    },
+    {
+      "case": "Same description, prefix clue",
+      "elapsed_ms": 1210.28,
+      "top_word": "bibliophile",
+      "encoder_retained": true
+    },
+    {
+      "case": "First Hindi search",
+      "elapsed_ms": 4445.991,
+      "top_word": "bibliophile",
+      "encoder_retained": true
+    },
+    {
+      "case": "Repeated Hindi search",
+      "elapsed_ms": 0.1,
+      "top_word": "bibliophile",
+      "encoder_retained": true
+    },
+    {
+      "case": "Same Hindi description, different result language",
+      "elapsed_ms": 59.017,
+      "top_word": "फ़क़ीर",
+      "encoder_retained": true
+    }
+  ]
+}
