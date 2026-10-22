@@ -41,4 +41,30 @@ jobs:
           cache-dependency-path: backend/requirements.txt
       - run: python -m pip install -r backend/requirements.txt
       # Contract/filter fixtures do not download dictionaries or model weights.
-      - run: python -m unittest backend.test_api backend.test_retrieval backend.test_bridge -v
+      - run: python -m unittest backend.test_api backend.test_retrieval backend.test_bridge backend.test_performance -v
+
+  runtime-memory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Build runtime container
+        run: docker build -t shabd-runtime .
+      - name: Check searches with a hard 512 MB limit and existing verified assets
+        run: |
+          docker run -d --name shabd-memory --memory=512m --memory-swap=512m --cpus=1 \
+            -p 127.0.0.1:8000:8000 \
+            -e ASSETS_URL=https://github.com/Rohan-Ktksu/shabdanveshi/releases/download/runtime-1/runtime-assets.tar.gz \
+            -e ASSETS_SHA256=d91b32e8f816f3048ed31822bb017d3fb3f40902f207a30413841af33f6485af \
+            shabd-runtime
+          python -m backend.deployment_smoke
+          docker exec shabd-memory cat /sys/fs/cgroup/memory.peak
+          docker exec shabd-memory sh -c '! grep -Eq "^oom_kill [1-9]" /sys/fs/cgroup/memory.events'
+      - name: Container logs
+        if: always()
+        run: docker logs shabd-memory || true
+      - name: Remove test container
+        if: always()
+        run: docker rm -f shabd-memory || true

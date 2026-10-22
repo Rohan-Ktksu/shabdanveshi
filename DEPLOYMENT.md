@@ -2,7 +2,19 @@
 
 Target: GitHub Pages frontend plus **Render Free** Python service. No paid service is selected by `render.yaml`.
 
-The original in-process backend measured about 1.15 GB on Windows. The compact mode stores dictionary records in SQLite, maps quantized vectors/postings from disk, and runs translation and embedding in separate short-lived processes. This is slower but lowers resident memory. A local measurement is not proof that Render's limit is satisfied; the GitHub workflow must pass its hard 512 MB container test first. Docker is unavailable on this development computer, so that gate has not yet run.
+The original in-process backend measured about 1.15 GB on Windows. Compact mode stores dictionary records in SQLite, maps quantized vectors/postings from disk, and isolates translation from embedding. The `runtime-1` asset release passed the original 512 MB test and was deployed on 18 October. The new speed update adds encoder reuse when memory permits and bounded caches; it requires a fresh container test. Docker is unavailable on this development computer, so local timings do not establish that the new runtime fits Render's limit.
+
+## Deploying the speed update
+
+No models, corpus or compact-export formats changed. Keep the current immutable `runtime-1` asset URL/checksum in Render; no asset rebuild is needed for this update.
+
+1. In Render, set **Auto-Deploy → After CI Checks Pass**, or sync the updated Blueprint with `autoDeployTrigger: checksPass` before pushing the speed changes. This prevents deployment before the memory check completes.
+2. Push the commits to `main`. **Project checks** builds the frontend, runs 28 backend tests and exercises repeated searches, distinct descriptions, Hindi translation/model switches and clues in a Docker container limited to **512 MB with no additional swap**. It reuses the checksum-pinned `runtime-1` archive and fails on OOM kills.
+3. Let all checks pass before deploying the backend. If the memory check fails, inspect the logs and fix it; keep the Free plan. `SHABD_WARM_ENCODER=0` disables encoder retention as a fallback, while leaving caches and batched lookups available.
+4. Run **Deploy frontend to GitHub Pages** to publish the one-time page-load health request. Frontend publication remains manual.
+5. Verify new and repeated English/Hindi searches against the live site. Local timings are not production guarantees; the first request after inactivity can still wait for a free instance to start.
+
+The original setup procedure below applies when creating a new service or changing resource assets.
 
 ## 1. Push and build verified resources
 

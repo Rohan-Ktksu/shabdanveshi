@@ -3,6 +3,7 @@ services:
     name: shabdanveshi-api
     runtime: docker
     plan: free
+    autoDeployTrigger: checksPass
     dockerfilePath: ./Dockerfile
     healthCheckPath: /api/health
     envVars:

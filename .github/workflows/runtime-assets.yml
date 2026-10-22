@@ -15,7 +15,7 @@ jobs:
           cache: pip
           cache-dependency-path: backend/requirements.txt
       - run: pip install -r backend/requirements.txt
-      - run: python -m unittest backend.test_api backend.test_retrieval backend.test_bridge -v
+      - run: python -m unittest backend.test_api backend.test_retrieval backend.test_bridge backend.test_performance -v
       - run: python -m backend.prepare --threads 2
       - run: python -m backend.build_compact
       - name: Build runtime container
@@ -29,6 +29,7 @@ jobs:
             shabd-runtime python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
           python -m backend.deployment_smoke
           docker exec shabd-memory cat /sys/fs/cgroup/memory.peak
+          docker exec shabd-memory sh -c '! grep -Eq "^oom_kill [1-9]" /sys/fs/cgroup/memory.events'
       - name: Container logs
         if: always()
         run: docker logs shabd-memory || true

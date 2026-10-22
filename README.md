@@ -75,7 +75,7 @@ The improved in-process backend measured roughly **1.15 GB of memory on Windows*
 - SQLite stores dictionary records and term metadata.
 - Dictionary vectors are exported as int8 with normalization data.
 - TF-IDF postings are precomputed; arrays are memory-mapped from disk.
-- Translation and embedding run in separate short-lived Python processes, releasing each model before the next stage.
+- Translation and embedding run in separate Python processes; their models never overlap. Initially every process was short-lived; the later speed update can retain the encoder when memory permits.
 - Vector scoring happens in chunks, and mapped arrays close after each search.
 
 This trades speed for lower resident memory. Full resources remain useful for preparation and comparison; production uses the compact export.
@@ -89,6 +89,18 @@ We created a **Render Blueprint** from the repository, explicitly using its **Fr
 Real production testing found a problem that local testing missed: Hindi translation on the free CPU exceeded the original **20-second worker timeout**. We raised the worker limit to **90 seconds** and the frontend request limit to **180 seconds**, committed the fix, and deployed both services again.
 
 The live description **“किताबों से प्रेम करने वाला व्यक्ति”** was then interpreted as **“A Lover of Books”** and returned **bibliophile** first. That request took about **39 seconds**. An English book-lover query also returned bibliophile first. These are observed examples, not guarantees for every description.
+
+### 9. Reducing repeated work during searches
+
+The compact runtime was reloading the embedding model for every description. The speed update reuses a single encoder worker when the Linux memory budget allows it, while still closing it before a new Hindi translation. A conservative memory check releases the encoder when space is tight; `SHABD_WARM_ENCODER=0` disables retention. Translation and embedding never coexist as loaded models.
+
+Bounded, process-local caches reuse translations, embeddings, scores and final suggestions for up to ten minutes. Changing result language or clues reuses scores but applies all filters again. Queries stay in server memory rather than a disk cache. Common searches now fetch ranked dictionary rows in batches instead of scanning every entry; prefix searches still check headwords and aliases across the dictionary.
+
+The browser also requests API health once when the page opens, starting a sleeping free instance while the visitor chooses a language or types. This does not eliminate Render cold starts or make every new Hindi translation faster.
+
+On **22 October 2026**, a sequential local run measured approximately **1.91 s** for the first English description, **0.24 s** for a different description with the encoder warm, and **under 1 ms** for repeated English/Hindi searches. The first Hindi search still took **4.45 s** locally. These are direct Python timings, excluding HTTP and hosting delays; see [measurements](backend/performance-local.json). The same fixed 20-case evaluation retained **11/20 first** and **16/20 first five**; see [results after optimization](backend/evaluation-performance.json).
+
+The updated code adds a separate **512 MB runtime check on pushes and pull requests**, using the existing verified `runtime-1` assets. The new runtime must pass this check before deployment. Local Docker verification is unavailable; these speed changes are not live merely because they are committed.
 
 ## How a search works
 
@@ -164,18 +176,18 @@ More details: [frontend guide](frontend/README.md), [backend guide](backend/READ
 
 | Verification | What it establishes |
 | --- | --- |
-| 11 Python unit tests | API contracts, filters and exact-gloss bridge behaviour |
+| 28 Python unit tests | API contracts, filters, bridge, caches and worker lifecycle |
 | TypeScript + Vite build | Frontend type correctness and production bundling |
 | Fixed 20-case evaluation | Diagnostic retrieval quality and coverage |
 | 512 MB Docker smoke test | Tested requests complete within the container limit |
 | Live API and browser checks | Public delivery, CORS, onboarding and real search behaviour |
 
-Run unit tests with `python -m unittest backend.test_api backend.test_retrieval backend.test_bridge -v`. With resources prepared, run `python -m backend.evaluate --compact` for retrieval evaluation. Run `npm run build` from `frontend/` to build the interface.
+Run unit tests with `python -m unittest backend.test_api backend.test_retrieval backend.test_bridge backend.test_performance -v`. With resources prepared, run `python -m backend.evaluate --compact` for retrieval evaluation and `python -m backend.benchmark` for sequential latency checks. Run `npm run build` from `frontend/` to build the interface.
 
-- **Project checks** runs on pushes and pull requests, building the frontend and running unit tests without downloading the full corpus.
+- **Project checks** runs on pushes and pull requests: frontend build, fixture-based backend tests, and a separate runtime container check using the published compact assets. It does not rebuild the corpus.
 - **Build and verify free-tier runtime** manually prepares, tests and publishes model/index assets.
 - **Deploy frontend to GitHub Pages** manually checks API readiness, builds and publishes the frontend.
-- **Render auto-deploy** deploys backend changes from `main`. Resource changes require a newly verified archive and updated asset URL/checksum settings.
+- **Render auto-deploy** is configured as `checksPass` in the Blueprint. Sync the Blueprint or set Auto-Deploy to **After CI Checks Pass** in Render so the runtime check gates deployment. Resource changes require a newly verified archive and updated asset URL/checksum settings.
 
 ## Limitations and lessons
 
