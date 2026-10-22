@@ -1,9 +1,17 @@
 """Exercise a running API, including cache hits, model switches and strict clues."""
 import json
 import os
+from pathlib import Path
 import time
+import unicodedata
 import urllib.request
 import urllib.error
+
+
+def predict(base, payload):
+    request=urllib.request.Request(base+'/api/predict',data=json.dumps(payload).encode(),headers={'Content-Type':'application/json'})
+    with urllib.request.urlopen(request,timeout=180) as response:
+        return json.load(response)
 
 
 def main():
@@ -28,9 +36,7 @@ def main():
         {'description':'someone who loves books','language':'en','starting_letter':'zzzzzzzz'},
         {'description':('a person who loves reading and collecting books in a library ' * 18)[:1000],'language':'en'},
     ]:
-        request=urllib.request.Request(base+'/api/predict',data=json.dumps(payload).encode(),headers={'Content-Type':'application/json'})
-        with urllib.request.urlopen(request,timeout=180) as response:
-            result=json.load(response)
+        result=predict(base, payload)
         if payload.get('starting_letter') == 'zzzzzzzz':
             assert result['suggestions'] == [], result
             continue
@@ -44,6 +50,19 @@ def main():
         if payload.get('starting_letter'):
             assert all(s['word'].lower().startswith('bib') for s in result['suggestions'])
         print(payload['language'],result['elapsed_ms'],flush=True)
+    # Keep the original diagnostic cases/expected answers unchanged. This
+    # protects the tested retrieval quality when inference settings change.
+    baseline=json.loads(Path(__file__).with_name('evaluation-compact.json').read_text(encoding='utf-8'))
+    normalize=lambda word: unicodedata.normalize('NFC', word).casefold().strip()
+    ranks=[]
+    for case in baseline['cases']:
+        result=predict(base, {'description':case['description'], 'language':case['language']})
+        expected={normalize(word) for word in case['expected']}
+        ranks.append(next((i+1 for i,item in enumerate(result['suggestions']) if normalize(item['word']) in expected), None))
+    quality={'top1':sum(rank==1 for rank in ranks), 'top5':sum(rank is not None for rank in ranks)}
+    print('Fixed diagnostic set:', quality, flush=True)
+    assert quality['top1'] >= baseline['summary']['top1'], quality
+    assert quality['top5'] >= baseline['summary']['top5'], quality
     print('Deployment smoke checks passed.',flush=True)
 
 
