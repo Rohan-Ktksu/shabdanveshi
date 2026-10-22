@@ -33,8 +33,8 @@ def main():
                 if request['mode'] != mode:
                     raise ValueError('Models must not overlap in a worker')
                 print(json.dumps({'result': run(request, model)}, ensure_ascii=False), flush=True)
-            except Exception:
-                print(json.dumps({'error': 'inference_failed'}), flush=True)
+            except Exception as exc:
+                print(json.dumps({'error': 'inference_failed', 'error_type': type(exc).__name__}), flush=True)
                 return
     else:
         request = json.load(sys.stdin)

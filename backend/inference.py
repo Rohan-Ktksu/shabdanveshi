@@ -94,7 +94,9 @@ class InferenceWorker:
             self.process.stdin.flush()
             response = self.responses.get(timeout=self.timeout)
             if not isinstance(response, dict) or 'result' not in response:
-                raise subprocess.CalledProcessError(1, 'inference worker')
+                failure = subprocess.CalledProcessError(self.process.poll() or 1, 'inference worker')
+                failure.worker_error_type = response.get('error_type', 'worker_stopped') if isinstance(response, dict) else 'invalid_response'
+                raise failure
             result = response['result']
         except queue.Empty as exc:
             self.close()

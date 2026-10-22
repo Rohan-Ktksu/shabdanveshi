@@ -60,7 +60,8 @@ def create_app(finder=None):
             suggestions = engine.search(query)
             translated_query = getattr(engine, 'last_translation', None)
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
-            log.error('Inference worker failed: %s', type(exc).__name__)
+            log.error('Inference worker failed: %s (exit=%s, worker=%s)', type(exc).__name__,
+                      getattr(exc, 'returncode', None), getattr(exc, 'worker_error_type', 'unknown'))
             raise HTTPException(503, 'Search resources are temporarily unavailable. Please retry.') from exc
         finally:
             app.state.busy.release()

@@ -32,7 +32,9 @@ jobs:
           docker exec shabd-memory sh -c '! grep -Eq "^oom_kill [1-9]" /sys/fs/cgroup/memory.events'
       - name: Container logs
         if: always()
-        run: docker logs shabd-memory || true
+        run: |
+          docker logs shabd-memory || true
+          docker exec shabd-memory cat /sys/fs/cgroup/memory.events /sys/fs/cgroup/memory.peak || true
       - run: python -m backend.package_assets
       - name: Publish verified assets
         env:
