@@ -18,9 +18,15 @@ class Encoder:
             # Keep the compact query worker's quantized graph as exported.
             # Whole-graph optimization can expand its peak working memory.
             options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_DISABLE_ALL
+        # Tokenizer JSON parsing temporarily uses much more memory than the
+        # retained vocabulary. Finish it before loading the ONNX session.
+        self.tokenizer = self.make_tokenizer() if compact else None
+        if compact:
+            release_unused_memory()
         self.session = ort.InferenceSession(str(MODEL / 'model_quantized.onnx'), options,
                                            providers=['CPUExecutionProvider'])
-        self.tokenizer = self.make_tokenizer()
+        if self.tokenizer is None:
+            self.tokenizer = self.make_tokenizer()
         self.lock = threading.Lock()
         if compact:
             release_unused_memory()
