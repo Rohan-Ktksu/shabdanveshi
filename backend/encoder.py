@@ -14,6 +14,10 @@ class Encoder:
         options.enable_mem_pattern = False
         options.add_session_config_entry('session.disable_prepacking', '1')
         options.intra_op_num_threads = threads
+        if transient_tokenizer:
+            # Keep the compact query worker's quantized graph as exported.
+            # Whole-graph optimization can expand its peak working memory.
+            options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_DISABLE_ALL
         self.session = ort.InferenceSession(str(MODEL / 'model_quantized.onnx'), options,
                                            providers=['CPUExecutionProvider'])
         self.transient_tokenizer = transient_tokenizer
