@@ -1,12 +1,15 @@
 """Isolated inference, optionally serving multiple encoder requests."""
 import json
 import sys
+from .memory import release_unused_memory
 
 
 def run(request, model):
     if request['mode'] == 'translate':
         return model.translate(request['text'])
-    return model.encode([request['text']])[0].tolist()
+    result = model.encode([request['text']])[0].tolist()
+    release_unused_memory()
+    return result
 
 
 def load(mode):
@@ -15,7 +18,7 @@ def load(mode):
         return Translator()
     if mode == 'encode':
         from .encoder import Encoder
-        return Encoder(threads=1)
+        return Encoder(threads=1, transient_tokenizer=True)
     raise ValueError('Unsupported inference mode')
 
 
