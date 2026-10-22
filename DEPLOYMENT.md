@@ -30,4 +30,6 @@ The authenticated CLI can also publish the linked project with `vercel deploy --
 3. Run **Deploy frontend to GitHub Pages**. The workflow checks API readiness before publishing.
 4. Verify the public website, including language settings, a real search and a repeat search. The page makes one health request when opened to start initialization while the user types.
 
+The switch completed in [Pages run 39799509663](https://github.com/Rohan-Ktksu/shabdanveshi/actions/runs/39799509663). The public bundle contains the Vercel origin, and a real Hindi search in the browser returned bibliophile with its definition and source. If an existing browser tab still uses the old backend, hard-refresh it with Ctrl+Shift+R to load the newly published HTML and JavaScript.
+
 Render auto-deploy is disabled in the dashboard and `render.yaml`. The old Free service stays available temporarily as a fallback. The Pages repository variable now uses the Vercel production origin. The legacy Render configuration does not select a paid plan.
