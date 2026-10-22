@@ -1,6 +1,6 @@
 # Free deployment: Vercel + GitHub Pages
 
-The backend is being moved from Render Free to **Vercel Hobby**. The React website stays on GitHub Pages, keeping its existing address. The project remains at `D:\sem 5\ShabdAnveshi`.
+The backend moved from Render Free to **Vercel Hobby** on 22 October 2026. Production API: **https://shabdanveshi-api.vercel.app**. The React website stays at **https://rohan-ktksu.github.io/shabdanveshi/**. The project remains at `D:\sem 5\ShabdAnveshi`.
 
 Vercel Hobby Python functions have **2 GB RAM and 1 vCPU**, which gives the encoder room to remain loaded. Hobby is free for personal/non-commercial projects and has monthly usage limits; exceeding them can pause service. It is not unlimited hosting. See [Hobby limits](https://vercel.com/docs/plans/hobby) and [function resources](https://vercel.com/docs/functions/limitations).
 
@@ -17,7 +17,7 @@ Vercel Hobby Python functions have **2 GB RAM and 1 vCPU**, which gives the enco
 
 ## GitHub deployment
 
-Connect the GitHub repository in the Vercel project so future pushes deploy the backend. If Vercel reports a missing GitHub Login Connection, connect GitHub under the Vercel account's authentication settings first. Grant access to this repository rather than unrelated repositories when the UI offers that choice.
+Native Git auto-deploy is pending. Vercel's API still reports a missing GitHub Login Connection even though the account shows connected. The production deployment itself succeeded through the authenticated CLI. Connect `Rohan-Ktksu/shabdanveshi` under this project's Git settings once the account connection is recognized; grant access to this repository rather than unrelated repositories when offered.
 
 The authenticated CLI can also publish the linked project with `vercel deploy --prod`. `.vercel/` metadata and local credentials are not committed.
 
@@ -30,4 +30,4 @@ The authenticated CLI can also publish the linked project with `vercel deploy --
 3. Run **Deploy frontend to GitHub Pages**. The workflow checks API readiness before publishing.
 4. Verify the public website, including language settings, a real search and a repeat search. The page makes one health request when opened to start initialization while the user types.
 
-Render auto-deploy is disabled in the dashboard and `render.yaml` during migration. The old Free service stays available temporarily as a fallback; the website should be switched only after Vercel has been tested. The legacy Render configuration does not select a paid plan.
+Render auto-deploy is disabled in the dashboard and `render.yaml`. The old Free service stays available temporarily as a fallback. The Pages repository variable now uses the Vercel production origin. The legacy Render configuration does not select a paid plan.

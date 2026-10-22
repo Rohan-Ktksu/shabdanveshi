@@ -6,9 +6,9 @@
 
 A bilingual reverse dictionary for moments when you remember a meaning but cannot recall the word. Describe a person, feeling, object or idea in English or Hindi, and search real dictionary entries for possible matches.
 
-[API documentation](https://shabdanveshi-api.onrender.com/docs) · [LinkedIn](https://www.linkedin.com/in/rohansai0907)
+[API documentation](https://shabdanveshi-api.vercel.app/docs) · [LinkedIn](https://www.linkedin.com/in/rohansai0907)
 
-The React frontend runs on GitHub Pages and the Python API on Render Free. Both deployments were verified on **18 October 2026**. This is an academic prototype: ambiguous descriptions, missing vocabulary and translation errors can affect results. Free hosting can make searches slow, especially after inactivity.
+The React frontend runs on GitHub Pages and the Python API on **Vercel Hobby**, migrated from Render Free on **22 October 2026**. This is an academic prototype: ambiguous descriptions, missing vocabulary and translation errors can affect results. Free hosting has usage limits and cold starts; latency varies.
 
 ## Our journey
 
@@ -26,7 +26,7 @@ The interface puts the description box at the centre, the logo on the left, and 
 
 ### 3. Building the interface and API
 
-We used **React, TypeScript and Vite** for the frontend and **Python with FastAPI** for the backend. GitHub Pages serves the static frontend; Render provides the running Python process.
+We used **React, TypeScript and Vite** for the frontend and **Python with FastAPI** for the backend. GitHub Pages serves the static frontend; the Python API initially ran on Render and now runs on Vercel Hobby.
 
 Interface language and result language are independent: a user can keep the interface in English, type Hindi, and request English, Hindi or both kinds of words. Starting letters, approximate length and part of speech provide optional clues. Sample conversations are explicitly illustrative; real searches call the API.
 
@@ -94,15 +94,27 @@ The live description **“किताबों से प्रेम करन
 
 The compact runtime was reloading the embedding model for every description. The speed update reuses a single encoder worker when the Linux memory budget allows it, while still closing it before a new Hindi translation. A conservative memory check releases the encoder when space is tight; `SHABD_WARM_ENCODER=0` disables retention. Translation and embedding never coexist as loaded models.
 
-Keeping the worker loaded on Render's 512 MB instance exposed memory pressure. The deployment is being migrated to **Vercel Hobby**, whose Python functions have 2 GB RAM and one vCPU. The original tokenizer, model weights and ranking rules are preserved. Unused native heap pages are returned to Linux, and the worker remains subject to a memory-headroom check.
+Keeping the worker loaded on Render's 512 MB instance exposed memory pressure. The API was migrated to **Vercel Hobby**, whose Python functions have 2 GB RAM and one vCPU. The original tokenizer, model weights and ranking rules are preserved. Unused native heap pages are returned to Linux, and the worker remains subject to a memory-headroom check.
 
 Bounded, process-local caches reuse translations, embeddings, scores and final suggestions for up to ten minutes. Changing result language or clues reuses scores but applies all filters again. Queries stay in server memory rather than a disk cache. Common searches now fetch ranked dictionary rows in batches instead of scanning every entry; prefix searches still check headwords and aliases across the dictionary.
 
-The browser also requests API health once when the page opens, starting a sleeping free instance while the visitor chooses a language or types. This does not eliminate Render cold starts or make every new Hindi translation faster.
+The browser also requests API health once when the page opens, starting initialization while the visitor chooses a language or types. Function instances and their caches can be recycled, so the first search after a cold start can still be slower.
 
 On **22 October 2026**, a sequential local run measured approximately **1.61 s** for the first English description, **0.17 s** for a different description with the encoder warm, and **under 1 ms** for repeated English/Hindi searches. The first Hindi search still took **2.97 s** locally. These are direct Python timings, excluding HTTP and hosting delays; see [measurements](backend/performance-local.json). The same fixed 20-case evaluation is recorded in [results after optimization](backend/evaluation-performance.json).
 
-The updated code adds a separate **2 GB runtime check on pushes and pull requests**, using the existing verified `runtime-1` assets. It checks startup, repeats, distinct queries, Hindi model switches and a maximum-length description, and compares all 20 result lists with the original code on the same Linux runner. The Vercel build bundles the verified assets so cold requests do not download them. Render auto-deploy is disabled during migration; no paid plan is selected.
+The separate **2 GB runtime check on pushes and pull requests** passed using the existing verified `runtime-1` assets. It checks startup, repeats, distinct queries, Hindi model switches and a maximum-length description. All 20 result lists matched the original code on the same Linux runner, with no OOM kills. See [the successful check](https://github.com/Rohan-Ktksu/shabdanveshi/actions/runs/39793080917). Quantized inference can vary across CPUs: the Linux diagnostic counted 10/20 first answers and 16/20 first-five answers, while Windows counted 11/20 and 16/20.
+
+The Vercel build bundles the checksum-verified assets, so cold requests do not download them. Live sequential HTTP measurements after a health request were:
+
+| Search | Vercel Hobby observed time |
+| --- | ---: |
+| First English description | 2.97 s |
+| Different English description, warm encoder | 0.41 s |
+| Repeated English description | 0.95 s |
+| First Hindi description | 3.37 s |
+| Repeated Hindi description | 0.09 s |
+
+The [earlier Render measurements](backend/performance-render-before.json) for the first English and Hindi examples were 14.56 s and 38.46 s. These are individual observations, not a controlled benchmark or a latency guarantee. Vercel HTTP timings include network delay and do not measure a full cold start; [raw measurements](backend/performance-live.json) also record server processing times. New Hindi descriptions still load translation separately, and weak Hindi suggestions remain possible. Render auto-deploy is disabled; its Free service is retained as a temporary fallback. No paid plan was selected.
 
 ## How a search works
 
@@ -146,7 +158,7 @@ Language and part-of-speech filters are exact. Prefixes use Unicode normalizatio
 | NumPy + SQLite | Compact vectors, postings, ranking and dictionary lookup |
 | regex | Unicode-aware clue handling |
 | Docker + GitHub Actions | Runtime packaging, checks, asset builds and deployment |
-| GitHub Pages + Render Free | Static frontend and Python backend hosting |
+| GitHub Pages + Vercel Hobby | Static frontend and Python backend hosting |
 
 ## Run locally
 
@@ -189,7 +201,7 @@ Run unit tests with `python -m unittest backend.test_api backend.test_retrieval 
 - **Project checks** runs on pushes and pull requests: frontend build, fixture-based backend tests, and a separate runtime container check using the published compact assets. It does not rebuild the corpus.
 - **Build and verify runtime assets** manually prepares, tests and publishes model/index assets.
 - **Deploy frontend to GitHub Pages** manually checks API readiness, builds and publishes the frontend.
-- **Vercel** builds the FastAPI backend and bundles the checksum-pinned model/index archive. The free Hobby plan has monthly limits; usage can be paused when those limits are reached. Render is retained temporarily as a manual fallback during migration.
+- **Vercel** builds the FastAPI backend and bundles the checksum-pinned model/index archive. The initial production deployment was published through the authenticated CLI. Native Git auto-deploy is still pending: Vercel reports a missing GitHub login connection despite the account showing connected. Until resolved, use `vercel deploy --prod` from the linked project. The free Hobby plan has monthly limits; usage can be paused when those limits are reached. Render remains a temporary manual fallback.
 
 ## Limitations and lessons
 
@@ -212,6 +224,8 @@ backend/licenses/       Third-party resource licenses
 designs/                Original interface concepts
 Dockerfile              Production Python container
 render.yaml             Free Render service configuration
+vercel.json             Current Python function configuration
+pyproject.toml          Python runtime and Vercel build entry point
 DEPLOYMENT.md           Deployment procedure
 ```
 

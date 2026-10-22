@@ -362,6 +362,12 @@
     ],
     "vector_format": "int8 with per-row norm"
   },
+  "runtime": {
+    "engine": "compact",
+    "query_graph_optimization": "default",
+    "query_tokenizer": "huggingface-tokenizers",
+    "encoder_threads": 1
+  },
   "cases": [
     {
       "language": "en",
@@ -381,7 +387,7 @@
       "translated_query": null,
       "expected_in_corpus": true,
       "rank": 1,
-      "elapsed_ms": 2919.3
+      "elapsed_ms": 1400.3
     },
     {
       "language": "en",
@@ -401,7 +407,7 @@
       "translated_query": null,
       "expected_in_corpus": true,
       "rank": 1,
-      "elapsed_ms": 455.4
+      "elapsed_ms": 241.8
     },
     {
       "language": "en",
@@ -419,7 +425,7 @@
       "translated_query": null,
       "expected_in_corpus": true,
       "rank": 2,
-      "elapsed_ms": 559.3
+      "elapsed_ms": 221.5
     },
     {
       "language": "en",
@@ -437,7 +443,7 @@
       "translated_query": null,
       "expected_in_corpus": true,
       "rank": 1,
-      "elapsed_ms": 530.5
+      "elapsed_ms": 135.3
     },
     {
       "language": "en",
@@ -455,7 +461,7 @@
       "translated_query": null,
       "expected_in_corpus": true,
       "rank": 1,
-      "elapsed_ms": 554.1
+      "elapsed_ms": 147.3
     },
     {
       "language": "en",
@@ -473,7 +479,7 @@
       "translated_query": null,
       "expected_in_corpus": true,
       "rank": 1,
-      "elapsed_ms": 664.3
+      "elapsed_ms": 200.7
     },
     {
       "language": "en",
@@ -493,7 +499,7 @@
       "translated_query": null,
       "expected_in_corpus": true,
       "rank": 1,
-      "elapsed_ms": 710.7
+      "elapsed_ms": 229.1
     },
     {
       "language": "en",
@@ -511,7 +517,7 @@
       "translated_query": null,
       "expected_in_corpus": false,
       "rank": null,
-      "elapsed_ms": 583.5
+      "elapsed_ms": 259.0
     },
     {
       "language": "en",
@@ -530,7 +536,7 @@
       "translated_query": "The Problem of Sleeping",
       "expected_in_corpus": true,
       "rank": null,
-      "elapsed_ms": 5874.1
+      "elapsed_ms": 3191.0
     },
     {
       "language": "en",
@@ -550,7 +556,7 @@
       "translated_query": "A Lover of Books",
       "expected_in_corpus": true,
       "rank": 1,
-      "elapsed_ms": 5095.1
+      "elapsed_ms": 4068.9
     },
     {
       "language": "en",
@@ -570,7 +576,7 @@
       "translated_query": "Time measuring device",
       "expected_in_corpus": true,
       "rank": 2,
-      "elapsed_ms": 5822.7
+      "elapsed_ms": 3530.5
     },
     {
       "language": "en",
@@ -588,7 +594,7 @@
       "translated_query": "Understanding the Feelings of Others",
       "expected_in_corpus": true,
       "rank": 1,
-      "elapsed_ms": 6458.7
+      "elapsed_ms": 4374.3
     },
     {
       "language": "hi",
@@ -606,7 +612,7 @@
       "translated_query": "The Problem of Sleeping",
       "expected_in_corpus": true,
       "rank": null,
-      "elapsed_ms": 46.7
+      "elapsed_ms": 18.5
     },
     {
       "language": "hi",
@@ -625,7 +631,7 @@
       "translated_query": "A Person Who Helps Others",
       "expected_in_corpus": true,
       "rank": 2,
-      "elapsed_ms": 4802.7
+      "elapsed_ms": 3716.5
     },
     {
       "language": "hi",
@@ -643,7 +649,7 @@
       "translated_query": "Which will never die.",
       "expected_in_corpus": true,
       "rank": null,
-      "elapsed_ms": 4802.6
+      "elapsed_ms": 3532.8
     },
     {
       "language": "hi",
@@ -662,7 +668,7 @@
       "translated_query": "The fish that live in the water",
       "expected_in_corpus": true,
       "rank": 4,
-      "elapsed_ms": 5903.3
+      "elapsed_ms": 2978.7
     },
     {
       "language": "hi",
@@ -680,7 +686,7 @@
       "translated_query": null,
       "expected_in_corpus": true,
       "rank": 1,
-      "elapsed_ms": 414.0
+      "elapsed_ms": 230.0
     },
     {
       "language": "hi",
@@ -698,7 +704,7 @@
       "translated_query": null,
       "expected_in_corpus": true,
       "rank": 2,
-      "elapsed_ms": 427.0
+      "elapsed_ms": 194.2
     },
     {
       "language": "hi",
@@ -718,7 +724,7 @@
       "translated_query": null,
       "expected_in_corpus": true,
       "rank": 1,
-      "elapsed_ms": 402.8
+      "elapsed_ms": 172.3
     },
     {
       "language": "hi",
@@ -737,7 +743,7 @@
       "translated_query": null,
       "expected_in_corpus": true,
       "rank": 1,
-      "elapsed_ms": 418.8
+      "elapsed_ms": 172.9
     }
   ]
 }

@@ -3,43 +3,43 @@
   "cases": [
     {
       "case": "First English search",
-      "elapsed_ms": 1911.509,
+      "elapsed_ms": 1612.262,
       "top_word": "bibliophile",
       "encoder_retained": true
     },
     {
       "case": "Different English search, warm encoder",
-      "elapsed_ms": 244.314,
+      "elapsed_ms": 168.604,
       "top_word": "nostalgia",
       "encoder_retained": true
     },
     {
       "case": "Repeated English search",
-      "elapsed_ms": 0.056,
+      "elapsed_ms": 0.028,
       "top_word": "bibliophile",
       "encoder_retained": true
     },
     {
       "case": "Same description, prefix clue",
-      "elapsed_ms": 1210.28,
+      "elapsed_ms": 1161.249,
       "top_word": "bibliophile",
       "encoder_retained": true
     },
     {
       "case": "First Hindi search",
-      "elapsed_ms": 4445.991,
+      "elapsed_ms": 2972.434,
       "top_word": "bibliophile",
       "encoder_retained": true
     },
     {
       "case": "Repeated Hindi search",
-      "elapsed_ms": 0.1,
+      "elapsed_ms": 0.066,
       "top_word": "bibliophile",
       "encoder_retained": true
     },
     {
       "case": "Same Hindi description, different result language",
-      "elapsed_ms": 59.017,
+      "elapsed_ms": 21.067,
       "top_word": "फ़क़ीर",
       "encoder_retained": true
     }

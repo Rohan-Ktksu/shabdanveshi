@@ -1,0 +1,57 @@
+{
+  "measured_on": "2026-10-22",
+  "backend_commit": "01f7e603a340b4b404a9dcaa93c378b87d33cd49",
+  "api": "https://shabdanveshi-api.onrender.com",
+  "note": "Sequential requests on the deployed Render Free instance after deployment. HTTP timings include network delay. Cold-start delay was not measured. Specific observations, not a latency guarantee.",
+  "cases": [
+    {
+      "case": "First English description",
+      "http_seconds": 14.555,
+      "server_ms": 14135.4,
+      "top_word": "bibliophile",
+      "translated_query": null
+    },
+    {
+      "case": "Different English description",
+      "http_seconds": 15.171,
+      "server_ms": 14859.5,
+      "top_word": "nostalgia",
+      "translated_query": null
+    },
+    {
+      "case": "Repeated English description",
+      "http_seconds": 0.76,
+      "server_ms": 0.0,
+      "top_word": "bibliophile",
+      "translated_query": null
+    },
+    {
+      "case": "First Hindi description",
+      "http_seconds": 38.458,
+      "server_ms": 37918.6,
+      "top_word": "bibliophile",
+      "translated_query": "A Lover of Books"
+    },
+    {
+      "case": "Repeated Hindi description",
+      "http_seconds": 1.851,
+      "server_ms": 0.0,
+      "top_word": "bibliophile",
+      "translated_query": "A Lover of Books"
+    },
+    {
+      "case": "Hindi description, result language changed",
+      "http_seconds": 0.558,
+      "server_ms": 95.8,
+      "top_word": "फ़क़ीर",
+      "translated_query": "A Lover of Books"
+    },
+    {
+      "case": "English description, prefix clue added",
+      "http_seconds": 4.618,
+      "server_ms": 4213.4,
+      "top_word": "bibliophile",
+      "translated_query": null
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "measured_on": "2026-10-22",
+  "backend_commit": "ff11591085d82b63fc729a501c4b088a0a336247",
+  "api": "https://shabdanveshi-api.vercel.app",
+  "note": "Sequential requests on Vercel Hobby, following an API health request. HTTP timings include network delay. Full cold-start delay was not measured. Specific observations, not a latency guarantee.",
+  "cases": [
+    {
+      "case": "First English description",
+      "http_seconds": 2.973,
+      "server_ms": 1199.6,
+      "top_word": "bibliophile",
+      "translated_query": null
+    },
+    {
+      "case": "Different English description",
+      "http_seconds": 0.412,
+      "server_ms": 77.2,
+      "top_word": "nostalgia",
+      "translated_query": null
+    },
+    {
+      "case": "Repeated English description",
+      "http_seconds": 0.951,
+      "server_ms": 0.0,
+      "top_word": "bibliophile",
+      "translated_query": null
+    },
+    {
+      "case": "First Hindi description",
+      "http_seconds": 3.374,
+      "server_ms": 3036.5,
+      "top_word": "bibliophile",
+      "translated_query": "A Lover of Books"
+    },
+    {
+      "case": "Repeated Hindi description",
+      "http_seconds": 0.093,
+      "server_ms": 0.0,
+      "top_word": "bibliophile",
+      "translated_query": "A Lover of Books"
+    },
+    {
+      "case": "Hindi description, result language changed",
+      "http_seconds": 0.116,
+      "server_ms": 16.9,
+      "top_word": "फ़क़ीर",
+      "translated_query": "A Lover of Books"
+    },
+    {
+      "case": "English description, prefix clue added",
+      "http_seconds": 1.33,
+      "server_ms": 325.6,
+      "top_word": "bibliophile",
+      "translated_query": null
+    }
+  ]
+}
