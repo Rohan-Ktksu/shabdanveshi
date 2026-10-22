@@ -18,7 +18,7 @@ def load(mode):
         return Translator()
     if mode == 'encode':
         from .encoder import Encoder
-        return Encoder(threads=1, transient_tokenizer=True)
+        return Encoder(threads=1, compact=True)
     raise ValueError('Unsupported inference mode')
 
 

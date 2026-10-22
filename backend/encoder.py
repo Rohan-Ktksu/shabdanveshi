@@ -8,22 +8,21 @@ from .memory import release_unused_memory
 
 
 class Encoder:
-    def __init__(self, threads=4, transient_tokenizer=False):
+    def __init__(self, threads=4, compact=False):
         options = ort.SessionOptions()
         options.enable_cpu_mem_arena = False
         options.enable_mem_pattern = False
         options.add_session_config_entry('session.disable_prepacking', '1')
         options.intra_op_num_threads = threads
-        if transient_tokenizer:
+        if compact:
             # Keep the compact query worker's quantized graph as exported.
             # Whole-graph optimization can expand its peak working memory.
             options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_DISABLE_ALL
         self.session = ort.InferenceSession(str(MODEL / 'model_quantized.onnx'), options,
                                            providers=['CPUExecutionProvider'])
-        self.transient_tokenizer = transient_tokenizer
-        self.tokenizer = None if transient_tokenizer else self.make_tokenizer()
+        self.tokenizer = self.make_tokenizer()
         self.lock = threading.Lock()
-        if transient_tokenizer:
+        if compact:
             release_unused_memory()
 
     @staticmethod
@@ -37,17 +36,12 @@ class Encoder:
         if kind not in ('query', 'passage'):
             raise ValueError('Expected query or passage')
         with self.lock:
-            tokenizer = self.tokenizer if self.tokenizer is not None else self.make_tokenizer()
-            tokens = tokenizer.encode_batch([f'{kind}: {text}' for text in texts])
+            tokens = self.tokenizer.encode_batch([f'{kind}: {text}' for text in texts])
             arrays = {
                 'input_ids': np.asarray([t.ids for t in tokens], dtype=np.int64),
                 'attention_mask': np.asarray([t.attention_mask for t in tokens], dtype=np.int64),
                 'token_type_ids': np.asarray([t.type_ids for t in tokens], dtype=np.int64),
             }
-            if self.transient_tokenizer:
-                # The large vocabulary is no longer needed once IDs are copied.
-                del tokenizer, tokens
-                release_unused_memory()
             hidden = self.session.run(None, {i.name: arrays[i.name] for i in self.session.get_inputs()})[0]
         mask = arrays['attention_mask'][..., None].astype(np.float32)
         pooled = (hidden * mask).sum(axis=1) / np.maximum(mask.sum(axis=1), 1e-9)
