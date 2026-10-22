@@ -41,7 +41,7 @@ class WorkerTests(unittest.TestCase):
     @patch('backend.inference.Path')
     def test_tight_cgroup_does_not_retain_model(self, path):
         path.return_value.exists.return_value = True
-        path.return_value.read_text.side_effect = ['536870912', '400000000', 'inactive_file 0']
+        path.return_value.read_text.side_effect = ['536870912', '500000000', 'inactive_file 0']
         self.assertFalse(can_keep_encoder())
 
     @patch.dict('os.environ', {'SHABD_WARM_ENCODER': 'auto'})

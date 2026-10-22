@@ -26,6 +26,7 @@ def main():
         {'description':'समय को मापने वाला उपकरण','language':'en'},
         {'description':'someone who loves books','language':'en','starting_letter':'bib'},
         {'description':'someone who loves books','language':'en','starting_letter':'zzzzzzzz'},
+        {'description':('a person who loves reading and collecting books in a library ' * 18)[:1000],'language':'en'},
     ]:
         request=urllib.request.Request(base+'/api/predict',data=json.dumps(payload).encode(),headers={'Content-Type':'application/json'})
         with urllib.request.urlopen(request,timeout=180) as response:

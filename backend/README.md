@@ -47,7 +47,7 @@ Prepare the compact export with `python -m backend.build_compact`, then set `SHA
 
 ## Search latency
 
-Compact mode retains one encoder worker if the container's current memory usage plus a 160 MiB ranking/cache reserve fits its limit. Reclaimable inactive file pages are excluded from that usage estimate. If the limit is unreadable or headroom is insufficient, the worker is released before ranking. Set `SHABD_WARM_ENCODER=0` to always release it. Translation closes any retained encoder first, runs separately, and exits before embedding. There is still only one admitted search at a time, and shutdown closes the worker.
+Compact mode retains one encoder worker if the container's current memory usage plus a 64 MiB ranking/cache reserve fits its limit. Reclaimable inactive file pages are excluded from that usage estimate. If the limit is unreadable or headroom is insufficient, the worker is released before ranking. Set `SHABD_WARM_ENCODER=0` to always release it. Translation closes any retained encoder first, runs separately, and exits before embedding. There is still only one admitted search at a time, and shutdown closes the worker. `SHABD_MEMORY_DIAGNOSTICS=1` logs byte counts and retention decisions without query text (used by CI).
 
 Three bounded in-memory caches expire entries after ten minutes: 64 inference values, four score sets (about 7 MiB for this corpus), and 64 result sets. A final-result key includes every request field. Changing filters can reuse scoring without bypassing clues. Failed inference is not cached; shutdown/restart clears all caches. These caches do not persist queries to disk.
 

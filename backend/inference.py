@@ -10,7 +10,7 @@ from .config import ROOT
 
 
 def can_keep_encoder():
-    """Reserve 160 MiB for ranking and cache overhead inside a Linux cgroup."""
+    """Reserve 64 MiB for ranking and cache overhead inside a Linux cgroup."""
     if os.environ.get('SHABD_WARM_ENCODER', 'auto') == '0':
         return False
     for limit_path, current_path, stat_path, cache_key in [
@@ -30,7 +30,11 @@ def can_keep_encoder():
                     current -= max(0, min(current, int(stats.get(cache_key, 0))))
                 except (OSError, ValueError):
                     pass
-                return current + 160 * 1024**2 < int(raw)
+                retain = current + 64 * 1024**2 < int(raw)
+                if os.environ.get('SHABD_MEMORY_DIAGNOSTICS') == '1':
+                    print(json.dumps({'encoder_working_bytes': current, 'limit_bytes': int(raw),
+                                      'reserve_bytes': 64 * 1024**2, 'retain_encoder': retain}), file=sys.stderr, flush=True)
+                return retain
             except (OSError, ValueError):
                 return False  # A detected but unreadable limit must not be guessed.
     return True  # Local development without a container memory limit.

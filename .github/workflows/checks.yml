@@ -56,6 +56,7 @@ jobs:
         run: |
           docker run -d --name shabd-memory --memory=512m --memory-swap=512m --cpus=1 \
             -p 127.0.0.1:8000:8000 \
+            -e SHABD_MEMORY_DIAGNOSTICS=1 \
             -e ASSETS_URL=https://github.com/Rohan-Ktksu/shabdanveshi/releases/download/runtime-1/runtime-assets.tar.gz \
             -e ASSETS_SHA256=d91b32e8f816f3048ed31822bb017d3fb3f40902f207a30413841af33f6485af \
             shabd-runtime
