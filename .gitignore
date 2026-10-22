@@ -20,4 +20,8 @@ frontend/*.tsbuildinfo
 qa/
 .pip-cache/
 .temp/
+.vercel/
 runtime-assets.tar.gz*
+
+.vercel
+.env*

@@ -8,26 +8,17 @@ from .memory import release_unused_memory
 
 
 class Encoder:
-    def __init__(self, threads=4, compact=False):
+    def __init__(self, threads=4):
         options = ort.SessionOptions()
         options.enable_cpu_mem_arena = False
         options.enable_mem_pattern = False
         options.add_session_config_entry('session.disable_prepacking', '1')
         options.intra_op_num_threads = threads
-        if compact:
-            from .query_tokenizer import QueryTokenizer
-            self.tokenizer = QueryTokenizer()
-        else:
-            self.tokenizer = None
-        if compact:
-            release_unused_memory()
         self.session = ort.InferenceSession(str(MODEL / 'model_quantized.onnx'), options,
                                            providers=['CPUExecutionProvider'])
-        if self.tokenizer is None:
-            self.tokenizer = self.make_tokenizer()
+        self.tokenizer = self.make_tokenizer()
         self.lock = threading.Lock()
-        if compact:
-            release_unused_memory()
+        release_unused_memory()
 
     @staticmethod
     def make_tokenizer():

@@ -10,7 +10,6 @@ def main():
     target=ROOT.parent/'runtime-assets.tar.gz'
     files=list((DATA/'compact').glob('*'))
     files += [MODEL/'model_quantized.onnx',MODEL/'tokenizer.json']
-    files += [MODEL/'query-tokenizer.model',MODEL/'query-tokenizer.json']
     files += [TRANSLATION_DIR/Path(name).name for name in TRANSLATION_FILES]
     files += list((ROOT/'licenses').glob('*'))+[ROOT/'ATTRIBUTION.md']
     with tarfile.open(target,'w:gz') as archive:

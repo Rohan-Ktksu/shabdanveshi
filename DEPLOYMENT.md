@@ -1,45 +1,33 @@
-# Free-tier deployment
+# Free deployment: Vercel + GitHub Pages
 
-Target: GitHub Pages frontend plus **Render Free** Python service. No paid service is selected by `render.yaml`.
+The backend is being moved from Render Free to **Vercel Hobby**. The React website stays on GitHub Pages, keeping its existing address. The project remains at `D:\sem 5\ShabdAnveshi`.
 
-The original in-process backend measured about 1.15 GB on Windows. Compact mode stores dictionary records in SQLite, maps quantized vectors/postings from disk, and isolates translation from embedding. The `runtime-1` asset release passed the original 512 MB test and was deployed on 18 October. The new speed update adds encoder reuse when memory permits and bounded caches; it requires a fresh container test. Docker is unavailable on this development computer, so local timings do not establish that the new runtime fits Render's limit.
+Vercel Hobby Python functions have **2 GB RAM and 1 vCPU**, which gives the encoder room to remain loaded. Hobby is free for personal/non-commercial projects and has monthly usage limits; exceeding them can pause service. It is not unlimited hosting. See [Hobby limits](https://vercel.com/docs/plans/hobby) and [function resources](https://vercel.com/docs/functions/limitations).
 
-## Deploying the speed update
+## Backend project
 
-No models, corpus or compact-export formats changed. Keep the current immutable `runtime-1` asset URL/checksum in Render; no asset rebuild is needed for this update.
+1. Create/import `Rohan-Ktksu/shabdanveshi` into the personal **Hobby** workspace as `shabdanveshi-api`.
+2. Keep the repository root as the project root and choose **FastAPI**. `pyproject.toml` resolves the app to `backend.main:app`; `.python-version` selects Python 3.12; the root requirements file includes only runtime dependencies.
+3. Use Fluid Compute and set `VERCEL_SUPPORT_LARGE_FUNCTIONS=1`. The public-beta Large Functions feature supports Python bundles up to 5 GB. This is needed to include the existing models/dictionary rather than downloading them on cold requests. New projects are enrolled by default; no Pro upgrade is selected. See [Large Functions](https://vercel.com/changelog/vercel-functions-can-now-be-up-to-5-gb-in-package-size-7yAwSyCig0IQDXUIDistvS/eadf06d6c3).
+4. The configured build command, `python -m backend.vercel_build`, downloads the immutable `runtime-1` archive, verifies its SHA-256 and prepares the files for bundling. `vercel.json` includes the model, compact index and license directories. Assets are not published as static files.
+5. Runtime settings in `vercel.json` select compact retrieval, one BLAS/OMP thread and the GitHub Pages CORS origin. They are public configuration, not credentials. Secrets and `.env` files are excluded from Git and CLI uploads.
+6. The function region is Mumbai (`bom1`) and its request limit is 180 seconds. Free-plan memory remains managed by Vercel. Cold starts still exist; the new deployment does not promise instant first requests.
 
-1. In Render, set **Auto-Deploy → After CI Checks Pass**, or sync the updated Blueprint with `autoDeployTrigger: checksPass` before pushing the speed changes. This prevents deployment before the memory check completes.
-2. Push the commits to `main`. **Project checks** builds the frontend, runs 28 backend tests and exercises repeated searches, distinct descriptions, Hindi translation/model switches and clues in a Docker container limited to **512 MB with no additional swap**. It reuses the checksum-pinned `runtime-1` archive and fails on OOM kills.
-3. Let all checks pass before deploying the backend. If the memory check fails, inspect the logs and fix it; keep the Free plan. `SHABD_WARM_ENCODER=0` disables encoder retention as a fallback, while leaving caches and batched lookups available.
-4. Run **Deploy frontend to GitHub Pages** to publish the one-time page-load health request. Frontend publication remains manual.
-5. Verify new and repeated English/Hindi searches against the live site. Local timings are not production guarantees; the first request after inactivity can still wait for a free instance to start.
+`backend/vercel_build.py` pins the archive URL and SHA-256. Update both only after a new verified resource release. Corpus/model settings did not change for this migration, so the existing resources can be reused.
 
-The original setup procedure below applies when creating a new service or changing resource assets.
+## GitHub deployment
 
-## 1. Push and build verified resources
+Connect the GitHub repository in the Vercel project so future pushes deploy the backend. If Vercel reports a missing GitHub Login Connection, connect GitHub under the Vercel account's authentication settings first. Grant access to this repository rather than unrelated repositories when the UI offers that choice.
 
-Push the committed code. In the repository's **Actions**, run **Build and verify free-tier runtime** on `main`. The first build downloads dictionaries/models and computes the index; allow up to 150 minutes. Standard public-repository GitHub-hosted runners are used.
+The authenticated CLI can also publish the linked project with `vercel deploy --prod`. `.vercel/` metadata and local credentials are not committed.
 
-The workflow builds the runtime Docker image and tests repeated English/Hindi requests with memory and swap both limited to 512 MB. It publishes a release only after success. If this job fails, inspect its container logs and fix the failure; do not select a paid Render plan as a workaround.
+**Project checks** runs the frontend build, 28 backend tests and a real API workload in a **2 GB container with no extra swap**. The runtime check also launches the original retrieval code at commit `d5ab2f5` on the same Linux runner and compares all 20 result lists. This avoids confusing CPU-dependent quantized inference differences with changes caused by caching or ranking optimizations.
 
-The release contains `runtime-assets.tar.gz` and `runtime-assets.tar.gz.sha256`. Copy the archive's HTTPS download link and the 64-character digest inside the checksum file. Use a specific release, not a mutable `latest` link.
+## Switch the existing website
 
-## 2. Create the Render service
+1. Verify the Vercel production API: health must report `ready`; new and repeated English/Hindi searches must return real suggestions; source links, clues and production CORS must work.
+2. Set the GitHub Actions repository variable `VITE_API_URL` to that verified production API origin, without a trailing slash.
+3. Run **Deploy frontend to GitHub Pages**. The workflow checks API readiness before publishing.
+4. Verify the public website, including language settings, a real search and a repeat search. The page makes one health request when opened to start initialization while the user types.
 
-In your existing Render account, create a **Blueprint** from `Rohan-Ktksu/shabdanveshi`. Review `render.yaml`: service `shabdanveshi-api`, Docker runtime, plan **Free**, health path `/api/health`.
-
-Set `ASSETS_URL` and `ASSETS_SHA256` from the successful release. The startup process verifies the archive checksum before extracting model/index files. It does not build the dictionary on the small runtime instance.
-
-Confirm that `/api/health` returns HTTP 200 and `status: ready`. Run English and Hindi searches against the deployed `/api/predict` endpoint. Free services may sleep when idle; wake-up delay is expected. No persistent disk is required, but resources download again after a fresh instance starts.
-
-## 3. Publish the frontend
-
-In GitHub **Settings → Pages**, select **GitHub Actions** as the publishing source. In **Settings → Secrets and variables → Actions → Variables**, add `VITE_API_URL` with the Render service's HTTPS URL, without a trailing slash. This is public configuration, not a secret.
-
-Run **Deploy frontend to GitHub Pages**. It checks API readiness before building the frontend. The intended address is `https://rohan-ktksu.github.io/shabdanveshi/`; it is not live merely because this file exists.
-
-Finally check language selection, a real English search, a Hindi search with its interpreted text, source links, filters and narrow-screen layout. The backend CORS origin is already set to `https://rohan-ktksu.github.io`.
-
-## Updating
-
-Each meaningful stage remains a separate Git commit. Rebuild runtime assets when dictionary/model/retrieval-export settings change; update both Render asset settings to the new immutable release. Frontend publication is manual through its workflow. Keep credentials in service settings, never source files or chat.
+Render auto-deploy is disabled in the dashboard and `render.yaml` during migration. The old Free service stays available temporarily as a fallback; the website should be switched only after Vercel has been tested. The legacy Render configuration does not select a paid plan.

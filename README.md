@@ -94,13 +94,15 @@ The live description **“किताबों से प्रेम करन
 
 The compact runtime was reloading the embedding model for every description. The speed update reuses a single encoder worker when the Linux memory budget allows it, while still closing it before a new Hindi translation. A conservative memory check releases the encoder when space is tight; `SHABD_WARM_ENCODER=0` disables retention. Translation and embedding never coexist as loaded models.
 
+Keeping the worker loaded on Render's 512 MB instance exposed memory pressure. The deployment is being migrated to **Vercel Hobby**, whose Python functions have 2 GB RAM and one vCPU. The original tokenizer, model weights and ranking rules are preserved. Unused native heap pages are returned to Linux, and the worker remains subject to a memory-headroom check.
+
 Bounded, process-local caches reuse translations, embeddings, scores and final suggestions for up to ten minutes. Changing result language or clues reuses scores but applies all filters again. Queries stay in server memory rather than a disk cache. Common searches now fetch ranked dictionary rows in batches instead of scanning every entry; prefix searches still check headwords and aliases across the dictionary.
 
 The browser also requests API health once when the page opens, starting a sleeping free instance while the visitor chooses a language or types. This does not eliminate Render cold starts or make every new Hindi translation faster.
 
-On **22 October 2026**, a sequential local run measured approximately **1.91 s** for the first English description, **0.24 s** for a different description with the encoder warm, and **under 1 ms** for repeated English/Hindi searches. The first Hindi search still took **4.45 s** locally. These are direct Python timings, excluding HTTP and hosting delays; see [measurements](backend/performance-local.json). The same fixed 20-case evaluation retained **11/20 first** and **16/20 first five**; see [results after optimization](backend/evaluation-performance.json).
+On **22 October 2026**, a sequential local run measured approximately **1.61 s** for the first English description, **0.17 s** for a different description with the encoder warm, and **under 1 ms** for repeated English/Hindi searches. The first Hindi search still took **2.97 s** locally. These are direct Python timings, excluding HTTP and hosting delays; see [measurements](backend/performance-local.json). The same fixed 20-case evaluation is recorded in [results after optimization](backend/evaluation-performance.json).
 
-The updated code adds a separate **512 MB runtime check on pushes and pull requests**, using the existing verified `runtime-1` assets. The new runtime must pass this check before deployment. Local Docker verification is unavailable; these speed changes are not live merely because they are committed.
+The updated code adds a separate **2 GB runtime check on pushes and pull requests**, using the existing verified `runtime-1` assets. It checks startup, repeats, distinct queries, Hindi model switches and a maximum-length description, and compares all 20 result lists with the original code on the same Linux runner. The Vercel build bundles the verified assets so cold requests do not download them. Render auto-deploy is disabled during migration; no paid plan is selected.
 
 ## How a search works
 
@@ -179,15 +181,15 @@ More details: [frontend guide](frontend/README.md), [backend guide](backend/READ
 | 28 Python unit tests | API contracts, filters, bridge, caches and worker lifecycle |
 | TypeScript + Vite build | Frontend type correctness and production bundling |
 | Fixed 20-case evaluation | Diagnostic retrieval quality and coverage |
-| 512 MB Docker smoke test | Tested requests complete within the container limit |
+| 2 GB Docker smoke test | Tested requests complete within the new host's limit and match the original results on the same platform |
 | Live API and browser checks | Public delivery, CORS, onboarding and real search behaviour |
 
 Run unit tests with `python -m unittest backend.test_api backend.test_retrieval backend.test_bridge backend.test_performance -v`. With resources prepared, run `python -m backend.evaluate --compact` for retrieval evaluation and `python -m backend.benchmark` for sequential latency checks. Run `npm run build` from `frontend/` to build the interface.
 
 - **Project checks** runs on pushes and pull requests: frontend build, fixture-based backend tests, and a separate runtime container check using the published compact assets. It does not rebuild the corpus.
-- **Build and verify free-tier runtime** manually prepares, tests and publishes model/index assets.
+- **Build and verify runtime assets** manually prepares, tests and publishes model/index assets.
 - **Deploy frontend to GitHub Pages** manually checks API readiness, builds and publishes the frontend.
-- **Render auto-deploy** is configured as `checksPass` in the Blueprint. Sync the Blueprint or set Auto-Deploy to **After CI Checks Pass** in Render so the runtime check gates deployment. Resource changes require a newly verified archive and updated asset URL/checksum settings.
+- **Vercel** builds the FastAPI backend and bundles the checksum-pinned model/index archive. The free Hobby plan has monthly limits; usage can be paused when those limits are reached. Render is retained temporarily as a manual fallback during migration.
 
 ## Limitations and lessons
 

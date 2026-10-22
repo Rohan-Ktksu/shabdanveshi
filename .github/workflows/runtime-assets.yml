@@ -1,4 +1,4 @@
-name: Build and verify free-tier runtime
+name: Build and verify runtime assets
 on:
   workflow_dispatch:
 permissions:
@@ -18,12 +18,11 @@ jobs:
       - run: python -m unittest backend.test_api backend.test_retrieval backend.test_bridge backend.test_performance -v
       - run: python -m backend.prepare --threads 2
       - run: python -m backend.build_compact
-      - run: python -m backend.query_tokenizer
       - name: Build runtime container
         run: docker build -t shabd-runtime .
-      - name: Run with a hard 512 MB memory limit
+      - name: Run with a hard 2 GB memory limit
         run: |
-          docker run -d --name shabd-memory --memory=512m --memory-swap=512m --cpus=1 \
+          docker run -d --name shabd-memory --memory=2g --memory-swap=2g --cpus=1 \
             -p 127.0.0.1:8000:8000 \
             -v "$PWD/backend/models:/app/backend/models:ro" \
             -v "$PWD/backend/data/generated/compact:/app/backend/data/generated/compact:ro" \
@@ -41,4 +40,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: runtime-${{ github.run_number }}
-        run: gh release create "$RELEASE_TAG" runtime-assets.tar.gz runtime-assets.tar.gz.sha256 --target "$GITHUB_SHA" --title "$RELEASE_TAG" --notes "Compact runtime assets. API smoke tests passed in a container limited to 512 MB. Source and model attribution included. This is not a production availability guarantee."
+        run: gh release create "$RELEASE_TAG" runtime-assets.tar.gz runtime-assets.tar.gz.sha256 --target "$GITHUB_SHA" --title "$RELEASE_TAG" --notes "Compact runtime assets. API smoke tests passed in a container limited to 2 GB. Source and model attribution included. This is not a production availability guarantee."

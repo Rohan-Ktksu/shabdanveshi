@@ -67,6 +67,7 @@ class InferenceWorker:
         process = subprocess.Popen([sys.executable, '-m', 'backend.inference_worker', '--serve'],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
             text=True, encoding='utf-8', bufsize=1, cwd=ROOT.parent,
+            env={**os.environ, 'PYTHONPATH': os.pathsep.join(sys.path)},
             creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
         responses = queue.Queue()
         self.process, self.mode, self.responses = process, mode, responses
@@ -89,6 +90,7 @@ class InferenceWorker:
             result = subprocess.run([sys.executable, '-m', 'backend.inference_worker'],
                 input=json.dumps({'mode': mode, 'text': text}), text=True, encoding='utf-8',
                 capture_output=True, timeout=self.timeout, check=True, cwd=ROOT.parent,
+                env={**os.environ, 'PYTHONPATH': os.pathsep.join(sys.path)},
                 creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
             return json.loads(result.stdout)
         if self.process is None or self.process.poll() is not None or self.mode != mode:

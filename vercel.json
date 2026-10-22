@@ -1,0 +1,19 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "fastapi",
+  "regions": ["bom1"],
+  "functions": {
+    "backend/main.py": {
+      "maxDuration": 180,
+      "includeFiles": "backend/{models,data/generated/compact,licenses}/**",
+      "excludeFiles": "{frontend/**,designs/**,.git/**,.github/**,.tools/**,.temp/**,.venv/**,**/__pycache__/**,backend/test_*.py,backend/evaluation*.json,backend/performance*.json}"
+    }
+  },
+  "env": {
+    "SHABD_ENGINE": "compact",
+    "CORS_ORIGINS": "https://rohan-ktksu.github.io",
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  }
+}
