@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1050" height="1335" viewBox="0 0 1050 1335" role="img" aria-labelledby="title desc">
+<title id="title">ShabdAnveshi search pipeline</title>
+<desc id="desc">Descriptions and optional clues enter the pipeline. Hindi descriptions are translated locally with OPUS-MT; other descriptions proceed directly. E5 embeddings and TF-IDF scores are combined, followed by an exact-gloss WordNet bridge, filtering, and dictionary results.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#53675b"/></marker></defs>
+<rect width="1050" height="1335" rx="16" fill="#f8faf7"/>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#17271e;font-size:23px;text-anchor:middle} .edge{fill:none;stroke:#53675b;stroke-width:2.5;marker-end:url(#arrow)} .node{fill:#fff;stroke:#668573;stroke-width:2} .branch{font-size:20px;fill:#425e4b}</style>
+<path class="edge" d="M525 130V175"/>
+<path class="edge" d="M395 225H250V320"/>
+<path class="edge" d="M655 225H800V505H710"/>
+<path class="edge" d="M250 405V450H525V470"/>
+<path class="edge" d="M525 540V575H250V610"/>
+<path class="edge" d="M525 540V575H800V610"/>
+<path class="edge" d="M250 695V740"/>
+<path class="edge" d="M800 695V740"/>
+<path class="edge" d="M250 825V855H525V890"/>
+<path class="edge" d="M800 825V855H525V890"/>
+<path class="edge" d="M525 960V1000"/>
+<path class="edge" d="M525 1070V1110"/>
+<path class="edge" d="M525 1180V1220"/>
+<rect class="node" x="340" y="50" width="370" height="80" rx="12" style="fill:#e7efe6"/>
+<text x="525" y="83.5"><tspan x="525" dy="0">Description and</tspan><tspan x="525" dy="29">optional clues</tspan></text>
+<path class="node" d="M525 175L655 225L525 275L395 225Z"/>
+<text x="525" y="233"><tspan x="525" dy="0">Hindi script?</tspan></text>
+<text x="318" y="209" class="branch"><tspan x="318" dy="0">Yes</tspan></text>
+<text x="727" y="209" class="branch"><tspan x="727" dy="0">No</tspan></text>
+<rect class="node" x="75" y="320" width="350" height="85" rx="12"/>
+<text x="250" y="356"><tspan x="250" dy="0">Local OPUS-MT</tspan><tspan x="250" dy="29">Hindi → English translation</tspan></text>
+<rect class="node" x="340" y="470" width="370" height="70" rx="12"/>
+<text x="525" y="513"><tspan x="525" dy="0">Query text</tspan></text>
+<rect class="node" x="75" y="610" width="350" height="85" rx="12"/>
+<text x="250" y="646"><tspan x="250" dy="0">Multilingual E5</tspan><tspan x="250" dy="29">Query embedding</tspan></text>
+<rect class="node" x="625" y="610" width="350" height="85" rx="12"/>
+<text x="800" y="646"><tspan x="800" dy="0">TF-IDF</tspan><tspan x="800" dy="29">Query terms</tspan></text>
+<rect class="node" x="75" y="740" width="350" height="85" rx="12"/>
+<text x="250" y="776"><tspan x="250" dy="0">Compare dictionary</tspan><tspan x="250" dy="29">vectors</tspan></text>
+<rect class="node" x="625" y="740" width="350" height="85" rx="12"/>
+<text x="800" y="776"><tspan x="800" dy="0">Read precomputed</tspan><tspan x="800" dy="29">postings</tspan></text>
+<rect class="node" x="340" y="890" width="370" height="70" rx="12"/>
+<text x="525" y="933"><tspan x="525" dy="0">Combine scores</tspan></text>
+<rect class="node" x="315" y="1000" width="420" height="70" rx="12"/>
+<text x="525" y="1043"><tspan x="525" dy="0">Exact-gloss WordNet bridge</tspan></text>
+<rect class="node" x="315" y="1110" width="420" height="70" rx="12"/>
+<text x="525" y="1153"><tspan x="525" dy="0">Filter clues and deduplicate</tspan></text>
+<rect class="node" x="315" y="1220" width="420" height="80" rx="12" style="fill:#e7efe6"/>
+<text x="525" y="1253.5"><tspan x="525" dy="0">Words, definitions</tspan><tspan x="525" dy="29">and source links</tspan></text>
+</svg>

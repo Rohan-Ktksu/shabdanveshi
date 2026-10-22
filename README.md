@@ -118,22 +118,9 @@ The [earlier Render measurements](backend/performance-render-before.json) for th
 
 ## How a search works
 
-```mermaid
-flowchart TD
-    A[Description and optional clues] --> B{Hindi script?}
-    B -->|Yes| C[Local OPUS-MT translation]
-    B -->|No| D[Query text]
-    C --> D
-    D --> E[Multilingual E5 embedding]
-    D --> F[TF-IDF query terms]
-    E --> G[Compare dictionary vectors]
-    F --> H[Read precomputed postings]
-    G --> I[Combine scores]
-    H --> I
-    I --> J[Exact-gloss WordNet bridge]
-    J --> K[Filter clues and deduplicate]
-    K --> L[Words, definitions and source links]
-```
+[![ShabdAnveshi search pipeline: translation, semantic and TF-IDF retrieval, ranking and results](docs/search-pipeline.png)](docs/search-pipeline.svg)
+
+[View the full-size pipeline](docs/search-pipeline.svg). Hindi descriptions are translated locally before retrieval; other descriptions go directly to query encoding. Optional clues are applied after scoring and bridge propagation.
 
 Before bridge propagation, ranking uses:
 
